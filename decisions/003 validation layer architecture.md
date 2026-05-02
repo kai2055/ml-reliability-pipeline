@@ -1,4 +1,3 @@
-
 # 003 — Validation Layer Architecture Decisions
 
 **Date:** 2026-05-01  
@@ -57,9 +56,13 @@
 
 **What I decided:** All coded value tuples in `schema.py` use lowercase. The transformer normalises incoming data to lowercase before the validator compares against the schema.
 
-**What I considered:** Storing values exactly as they appear in the data dictionary — mixed case like `"PIF"`, `"CHGOFF"`. Or storing them exactly as they appear in the raw CSV — which turned out to have whitespace pollution like `"P I F"`.
+**What I considered:**
+- Using raw data values directly — rejected because the data has too much variation, especially in columns with long string values. Trying to capture every variation in the schema would add complexity and defeat the purpose.
+- Using data dictionary values as-is — possible, but the data dictionary uses mixed case and the raw data doesn't follow it consistently anyway.
 
-**Why I went with lowercase:** The schema is a rulebook, not a copy of the data. I write the rules once in a clean, consistent form. The transformer handles the messiness of the real world. If the schema had to account for every casing variation, it would not be a rulebook — it would be a list of known bugs.
+**Why I went with lowercase:** The schema's job is to define what correct looks like after cleaning — not to mirror the mess in the raw data. Converting everything to lowercase makes both diagnosis and transformation simpler and consistent.
+
+**An important distinction I want to record:** The validator's diagnosis shows messiness — it reports what is wrong. The transformation is about the pipeline's ability to function at all — if certain columns can't be parsed or compared, the whole pipeline breaks. These are two different concerns even though they work on the same data.
 
 ---
 
