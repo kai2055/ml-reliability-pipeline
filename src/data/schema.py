@@ -46,7 +46,20 @@ EXPECTED_COLUMNS = (
 
 PROGRAM_VALUES = ("7a",)
 
-LOAN_STATUS_VALUES = ("commit", "pif", "chgoff", "cancld", "exempt")
+LOAN_STATUS_VALUES = (
+    "pif",
+    "cancld",
+    "curr",
+    "chgoff",
+    "purch(not c/o)",
+    "clsln",
+    "liquid",
+    "delinq",
+    "pstdue",
+    "deferd",
+    "commit",
+    "soldnc",
+)
 
 REVOLVER_STATUS_VALUES = (0, 1)
 
