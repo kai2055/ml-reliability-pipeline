@@ -1,0 +1,37 @@
+
+# 005 — Usable Row Threshold Decision
+
+**Date:** 2026-05-03  
+**Component:** Data validation layer (`src/data/`)  
+**Status:** Decided
+
+---
+
+## Context
+
+ADR 003 defined a fatal check for when EXEMPT rows exceed a threshold. After inspecting the actual data, the EXEMPT framing no longer holds. The SBA data contains twelve distinct loan status values, organised into three buckets in ADR 004. EXEMPT does not appear in either file at all.
+
+The real concern is not EXEMPT rows specifically — it is whether enough usable rows survive the transformer to make the dataset worth processing. Usable means Bucket 3 Keep only: `PIF` and `CHGOFF`. Everything else gets dropped.
+
+The threshold needs to protect against two failure modes: a dataset that is structurally wrong (wrong composition regardless of size) and a dataset that is simply too small to be useful.
+
+---
+
+## Decision
+
+A dataset is rejected as fatal if either condition is true:
+
+- Usable rows fall below **12%** of total rows
+- Usable rows fall below **50,000** in absolute count
+
+Both conditions are checked. Either one failing is enough to reject the dataset.
+
+These numbers are grounded in what we actually observed. The training file produces 67,637 usable rows (18.1% of total). The thresholds sit comfortably below that, giving room for natural variation while still catching datasets that are genuinely broken.
+
+---
+
+## Consequences
+
+**For `validator.py`:** The EXEMPT threshold check defined in ADR 003 is replaced by a usable row threshold check. The function takes the transformed DataFrame, counts rows where `loanstatus` is `pif` or `chgoff`, and checks both the percentage and absolute count against the thresholds above. This is a fatal check — if it fails, the dataset is rejected.
+
+**ADR 003 is superseded on this point.** All other decisions in ADR 003 remain in force.
