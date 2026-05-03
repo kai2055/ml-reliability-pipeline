@@ -83,6 +83,43 @@ def check_usable_rows(df: pd.DataFrame)-> dict:
         }
         
     }
+
+
+
+def check_program_values(df: pd.DataFrame)-> dict:
+    """
+    Checks is the dataframe has the minimum threshold for 7(A) rows
+
+    args:
+        df (pd.DataFrame): The datframe of the dataset
+
+    returns:
+        dict with status ('pass' or 'fail'). On both cases includes
+        total 7A row counts and percentage of 7A rows 
+    
+    """
+    PERCENT_THRESHOLD = 0.92
+
+    total_rows = len(df)
+
+    program_rows = (df["program"] == "7a").sum()
+    program_pct = program_rows / total_rows
+
+    if program_pct < PERCENT_THRESHOLD:
+        return {
+            "status": "fail",
+            "details": {
+                "7a_rows": program_rows,
+                "7a_pct": round(program_pct, 4),
+            }
+        }
+    return {
+        "status": "pass",
+        "details": {
+            "7a_rows": program_rows,
+            "7a_pct": round(program_pct, 4),
+        }
+    }
     
 
 
