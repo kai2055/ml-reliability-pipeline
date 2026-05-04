@@ -44,6 +44,55 @@ EXPECTED_COLUMNS = (
     "soldsecmrktind",
 )
 
+COLUMN_TYPES = {
+    "asofdate": "date",
+    "program": "string",
+    "locationid": "string",
+    "borrname": "string",
+    "borrstreet": "string",
+    "borrcity": "string",
+    "borrstate": "string",
+    "borrzip": "string",
+    "bankname": "string",
+    "bankfdicnumber": "string",
+    "bankncuanumber": "string",
+    "bankstreet": "string",
+    "bankcity": "string",
+    "bankstate": "string",
+    "bankzip": "string",
+    "grossapproval": "integer",
+    "sbaguaranteedapproval": "integer",
+    "approvaldate": "date",
+    "approvalfy": "integer",
+    "firstdisbursementdate": "date",
+    "processingmethod": "string",
+    "subprogram": "string",
+    "initialinterestrate": "float",
+    "naicscode": "string",
+    "naicsdescription": "string",
+    "franchisecode": "string",
+    "franchisename": "string",
+    "projectcounty": "string",
+    "projectstate": "string",
+    "sbadistrictoffice": "string",
+    "congressionaldistrict": "string",
+    "businesstype": "string",
+    "businessage": "string",
+    "loanstatus": "string",
+    "paidinfulldate": "date",
+    "chargeoffdate": "date",
+    "grosschargeoffamount": "float",
+    "fixedorvariableinterestind": "string",
+    "terminmonths": "integer",
+    "revolverstatus": "integer",
+    "collateralind": "string",
+    "soldsecmrktind": "string",
+    "jobssupported":"integer",
+}
+
+
+
+
 PROGRAM_VALUES = ("7a",)
 
 LOAN_STATUS_VALUES = (
