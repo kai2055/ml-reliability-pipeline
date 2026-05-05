@@ -18,10 +18,22 @@ def _lowercase_string_columns(df: pd.DataFrame) -> pd.DataFrame:
         df[col] = df[col].str.lower()
     return df
 
+def _remove_internal_whitespace(s: pd.Series) -> pd.Series:\
+    return s.str.replace(" ", "", regex=False)
+
+def _coerce_revolver_status(s: pd.Series) -> pd.Series:
+    return s.astype(str).str.lower().map({"true": 1, "false": 0, "1": 1, "0": 0}).astype("Int64")
+
+
 
 
 def transform(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df = _strip_string_columns(df)
     df = _lowercase_string_columns(df)
+    df["loanstatus"] = _remove_internal_whitespace(df["loanstatus"])
+    df["revolverstatus"] = _coerce_revolver_status(df["revolverstatus"])
+
     return df
+
+
