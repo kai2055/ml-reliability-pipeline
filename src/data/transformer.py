@@ -7,6 +7,11 @@ from src.data.schema import (
     DATE_COLUMNS,
 )
 
+def _coerce_string_columns(df: pd.DataFrame) -> pd.DataFrame:
+    for col in STRING_COLUMNS:
+        df[col] = df[col].astype("string")
+    return df
+
 
 def _strip_string_columns(df: pd.DataFrame) -> pd.DataFrame:
     for col in STRING_COLUMNS:
@@ -44,6 +49,7 @@ def _parse_date_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 def transform(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
+    df = _coerce_string_columns(df)
     df = _strip_string_columns(df)
     df = _lowercase_string_columns(df)
     df["loanstatus"] = _remove_internal_whitespace(df["loanstatus"])
