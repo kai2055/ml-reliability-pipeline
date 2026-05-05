@@ -34,6 +34,11 @@ def _coerce_float_columns(df: pd.DataFrame) -> pd.DataFrame:
         df[col] = pd.to_numeric(df[col], errors="coerce")
     return df
 
+def _parse_date_columns(df: pd.DataFrame) -> pd.DataFrame:
+    for col in DATE_COLUMNS:
+        df[col] = pd.to_datetime(df[col], errors="coerce")
+    return df
+
 
 
 
@@ -45,6 +50,7 @@ def transform(df: pd.DataFrame) -> pd.DataFrame:
     df["revolverstatus"] = _coerce_revolver_status(df["revolverstatus"])
     df = _coerce_integer_columns(df)
     df = _coerce_float_columns(df)
+    df = _parse_date_columns(df)
 
     return df
 
