@@ -91,6 +91,14 @@ COLUMN_TYPES = {
 }
 
 
+STRING_COLUMNS = tuple(column for column, column_type in COLUMN_TYPES.items() if column_type == "string")
+INTEGER_COLUMNS = tuple(column for column, column_type in COLUMN_TYPES.items() if column_type == "integer")
+FLOAT_COLUMNS = tuple(column for column, column_type in COLUMN_TYPES.items() if column_type == "float")
+DATE_COLUMNS = tuple(column for column, column_type in COLUMN_TYPES.items() if column_type == "date")
+
+
+
+
 
 
 PROGRAM_VALUES = ("7a",)
