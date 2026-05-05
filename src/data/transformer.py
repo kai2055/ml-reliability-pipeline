@@ -24,6 +24,11 @@ def _remove_internal_whitespace(s: pd.Series) -> pd.Series:\
 def _coerce_revolver_status(s: pd.Series) -> pd.Series:
     return s.astype(str).str.lower().map({"true": 1, "false": 0, "1": 1, "0": 0}).astype("Int64")
 
+def _coerce_integer_columns(df: pd.DataFrame) -> pd.DataFrame:
+    for col in INTEGER_COLUMNS:
+        df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
+    return df
+
 
 
 
@@ -33,6 +38,7 @@ def transform(df: pd.DataFrame) -> pd.DataFrame:
     df = _lowercase_string_columns(df)
     df["loanstatus"] = _remove_internal_whitespace(df["loanstatus"])
     df["revolverstatus"] = _coerce_revolver_status(df["revolverstatus"])
+    df = _coerce_integer_columns(df)
 
     return df
 
