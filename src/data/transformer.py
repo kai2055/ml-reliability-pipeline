@@ -13,9 +13,15 @@ def _strip_string_columns(df: pd.DataFrame) -> pd.DataFrame:
         df[col] = df[col].str.strip()
     return df
 
+def _lowercase_string_columns(df: pd.DataFrame) -> pd.DataFrame:
+    for col in STRING_COLUMNS:
+        df[col] = df[col].str.lower()
+    return df
+
 
 
 def transform(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df = _strip_string_columns(df)
+    df = _lowercase_string_columns(df)
     return df
