@@ -1,6 +1,6 @@
 
 import pandas as pd
-from schema import EXPECTED_COLUMNS
+from src.data.schema import EXPECTED_COLUMNS
 
 
 def check_columns(df: pd.DataFrame) -> dict:
@@ -121,6 +121,23 @@ def check_program_values(df: pd.DataFrame)-> dict:
         }
     }
     
+
+
+# --------------------------------------------------------------------------------------------
+# Non-fatal checks
+# -----------------------------------------------------------------------------------------------------
+
+
+
+def check_missing_rates(df: pd.DataFrame) -> dict:
+    return {
+        col: {
+            "null_count": int(df[col].isna().sum()),
+            "null_pct": float(df[col].isna().mean()),
+        }
+        for col in df.columns
+    }
+
 
 
     
