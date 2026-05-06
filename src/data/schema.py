@@ -96,7 +96,15 @@ INTEGER_COLUMNS = tuple(column for column, column_type in COLUMN_TYPES.items() i
 FLOAT_COLUMNS = tuple(column for column, column_type in COLUMN_TYPES.items() if column_type == "float")
 DATE_COLUMNS = tuple(column for column, column_type in COLUMN_TYPES.items() if column_type == "date")
 
-
+REQUIRED_COLUMNS = (
+    "program",
+    "loanstatus",
+    "approvaldate",
+    "grossapproval",
+    "revolverstatus",
+    "initialinterestrate",
+    "terminmonths",
+)
 
 
 
