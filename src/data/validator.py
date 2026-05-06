@@ -1,6 +1,6 @@
 
 import pandas as pd
-from src.data.schema import EXPECTED_COLUMNS
+from src.data.schema import EXPECTED_COLUMNS, VALID_VALUES
 
 
 def check_columns(df: pd.DataFrame) -> dict:
@@ -137,6 +137,17 @@ def check_missing_rates(df: pd.DataFrame) -> dict:
         }
         for col in df.columns
     }
+
+
+def check_unknown_values(df: pd.DataFrame) -> dict:
+    return {
+        col : sorted(set(df[col].dropna().unique()) - set(valid))
+        for col, valid in VALID_VALUES.items()
+    }
+
+
+
+
 
 
 
