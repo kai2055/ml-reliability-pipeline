@@ -123,12 +123,23 @@ LOAN_STATUS_VALUES = (
     "soldnc",
 )
 
+# revolverstatus and collateralind are both boolean concepts but stored
+# differently per the SBA data dictionary's original conventions:
+# revolverstatus uses 0/1, collateralind uses "true"/"false".
+# The schema preserves these conventions faithfully. Encoding to a
+# uniform representation happens in the model layer, not here.
 REVOLVER_STATUS_VALUES = (0, 1)
 
 INTEREST_IND_VALUES = ("f", "v")
 
 BUSINESS_TYPE_VALUES = ("individual", "partnership", "corporation")
 
+
+# revolverstatus and collateralind are both boolean concepts but stored
+# differently per the SBA data dictionary's original conventions:
+# revolverstatus uses 0/1, collateralind uses "true"/"false".
+# The schema preserves these conventions faithfully. Encoding to a
+# uniform representation happens in the model layer, not here.
 COLLATERAL_IND_VALUES = ("true", "false")
 
 SOLD_SEC_MRKT_VALUES = ("y", "n")
