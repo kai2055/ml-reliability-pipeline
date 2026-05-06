@@ -167,3 +167,15 @@ PROCESSING_METHOD_VALUES = (
     "small loan advantage initiative",
     "standard asset base working capital line of credit (capline)",
 )
+
+
+VALID_VALUES = {
+    "loanstatus": LOAN_STATUS_VALUES,
+    "revolverstatus": REVOLVER_STATUS_VALUES,
+    "fixedorvariableinterestind": INTEREST_IND_VALUES,
+    "businesstype": BUSINESS_TYPE_VALUES,
+    "collateralind": COLLATERAL_IND_VALUES,
+    "soldsecmrktind": SOLD_SEC_MRKT_VALUES,
+    "businessage": BUSINESS_AGE_VALUES,
+    "processingmethod": PROCESSING_METHOD_VALUES,
+}
