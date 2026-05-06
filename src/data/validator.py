@@ -1,6 +1,6 @@
 
 import pandas as pd
-from src.data.schema import EXPECTED_COLUMNS, VALID_VALUES
+from src.data.schema import EXPECTED_COLUMNS, VALID_VALUES, REQUIRED_COLUMNS
 
 
 def check_columns(df: pd.DataFrame) -> dict:
@@ -143,6 +143,14 @@ def check_unknown_values(df: pd.DataFrame) -> dict:
     return {
         col : sorted(set(df[col].dropna().unique()) - set(valid))
         for col, valid in VALID_VALUES.items()
+    }
+
+
+def check_required_columns(df: pd.DataFrame) -> dict:
+    return {
+        col: int(df[col].isna().sum())
+        for col in REQUIRED_COLUMNS
+        if df[col].isna().any()
     }
 
 
