@@ -61,7 +61,7 @@ COLUMN_TYPES = {
     "bankstate": "string",
     "bankzip": "string",
     "grossapproval": "integer",
-    "sbaguaranteedapproval": "integer",
+    "sbaguaranteedapproval": "float",
     "approvaldate": "date",
     "approvalfy": "integer",
     "firstdisbursementdate": "date",
@@ -108,7 +108,7 @@ LOAN_STATUS_VALUES = (
     "cancld",
     "curr",
     "chgoff",
-    "purch(not c/o)",
+    "purch(notc/o)",
     "clsln",
     "liquid",
     "delinq",
@@ -126,13 +126,19 @@ BUSINESS_TYPE_VALUES = ("individual", "partnership", "corporation")
 
 COLLATERAL_IND_VALUES = ("true", "false")
 
-SOLD_SEC_MRKT_VALUES = ("y",)
+SOLD_SEC_MRKT_VALUES = ("y", "n")
 
 BUSINESS_AGE_VALUES = (
     "change of ownership",
     "existing or more than 2 years old",
     "new business or 2 years or less",
     "startup, loan funds will open business",
+    "existing, 5 or more years",
+    "less than 3 years old but at least 2",
+    "less than 4 years old but at least 3",
+    "less than 5 years old but at least 4",
+    "new, less than 1 year old",
+    "unanswered",
 )
 
 PROCESSING_METHOD_VALUES = (
