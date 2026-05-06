@@ -103,6 +103,11 @@ DATE_COLUMNS = tuple(column for column, column_type in COLUMN_TYPES.items() if c
 
 PROGRAM_VALUES = ("7a",)
 
+
+# Values reflect post-transformation form. The transformer strips
+# internal whitespace from loan status, so "PURCH(NOT C/O)" in raw
+# data becomes "purch(notc/o)" here.
+
 LOAN_STATUS_VALUES = (
     "pif",
     "cancld",
