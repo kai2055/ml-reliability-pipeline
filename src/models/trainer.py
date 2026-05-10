@@ -4,6 +4,8 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
+import pandas as pd
+
 
 
 
@@ -42,3 +44,24 @@ def build_pipeline(numerical_cols, categorical_cols, model) -> Pipeline:
     
     return pipeline
 
+
+
+def train(pipeline: Pipeline, X: pd.DataFrame, Y:pd.Series) ->Pipeline:
+    """
+    Fit a pipeline on training data
+
+    Args: 
+        pipeline (Pipeline): An unfitted sklearn Pipeline
+        X (pd.DataFrame): Training features
+        Y (pd.Series): Training target labels
+
+    Returns:
+        Pipeline: The fitted pipeline, ready for prediction
+
+    """
+    return pipeline.fit(X, Y)
+
+
+
+
+    
