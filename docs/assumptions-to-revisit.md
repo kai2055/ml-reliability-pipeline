@@ -84,11 +84,39 @@ Status legend:
 
 ---
 
+
 ## Evaluation Metrics
 
-*(will be populated as we build evaluator.py — at minimum: which
-metrics, why those, why not others, how to choose when business cost
-of FP differs from FN)*
+### Q5: Which metrics should evaluator.py compute, and why those four?
+- **Status:** 🔴 Open — decided conceptually, ADR pending after code
+- **Surfaced in:** `src/models/evaluator.py` (pre-build session)
+- **What we decided:** Four metrics — Precision, Recall, AUC, Log Loss
+- **Reason for each:**
+  - Precision — of every loan Datatroniq approved, how many actually
+    repaid. Measures the quality of the approval decision itself.
+  - Recall — of every applicant who would have repaid, how many did
+    the model catch. Measures coverage of good applicants.
+  - AUC — how well the model separates defaulters from repayers across
+    all possible thresholds at once. Threshold-independent. Tells you
+    if the model is fundamentally capable before the risk team decides
+    where to set the threshold.
+  - Log Loss — measures probability calibration quality, not just the
+    hard label. Penalises confident wrong predictions heavily. A model
+    that says 95% repayment probability and gets a default is punished
+    far more than one that said 52%.
+- **Why not accuracy:** Accuracy treats both error types as equally
+  costly. At Datatroniq they are not — approving a defaulter is a
+  direct financial loss, rejecting a good applicant is missed revenue.
+  Accuracy would hide this asymmetry.
+- **Why not just precision and recall:** They only measure the hard
+  decision at a fixed threshold. They say nothing about whether the
+  model's probability estimates are trustworthy. Log Loss and AUC fill
+  that gap.
+- **Where the answer lives:** Zheng — Evaluating Machine Learning
+  Models (the whole book is relevant here); Géron Ch. 3 (classification
+  metrics in practice)
+- **ADR status:** Pending — to be written after evaluator.py is built
+- **Opened:** 2026-05-11
 
 ---
 
