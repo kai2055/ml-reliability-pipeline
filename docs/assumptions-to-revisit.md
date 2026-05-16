@@ -16,32 +16,6 @@ Status legend:
 
 ## Feature Selection
 
-### Q1: Should every feature be used, or should some be pruned?
-- **Status:** 🔴 Open
-- **Surfaced in:** `src/models/trainer.py`
-- **What we did:** All features from the schema are passed through to
-  the pipeline. No feature selection step exists.
-- **Reason given at the time:** Not discussed during the session. The
-  feature set was accepted as-is from the data layer.
-- **Where the answer lives:** Géron Ch. 2 (feature selection in
-  practice); ISLP Ch. 6 (subset selection, regularisation as implicit
-  selection)
-- **Opened:** 2026-05-11
-
-### Q2: Why are certain columns treated as numerical vs categorical?
-- **Status:** 🔴 Open
-- **Surfaced in:** `src/models/trainer.py`
-- **What we did:** The caller passes `numerical_cols` and
-  `categorical_cols` as separate lists. The split itself was inherited
-  from the data layer's schema.
-- **Reason given at the time:** Not discussed during the trainer.py
-  session. The schema's type assignments were accepted without
-  examination of edge cases (e.g. is `businessage` ordinal? are there
-  numerical columns that should be binned?).
-- **Where the answer lives:** Géron Ch. 2 (feature types and encoding
-  choices); Zheng "Feature Engineering for Machine Learning" Ch. 2
-  (numerical transformations, binning) and Ch. 5 (categorical encoding)
-- **Opened:** 2026-05-11
 
 ---
 
@@ -156,6 +130,126 @@ Status legend:
 - **ADR status:** Pending — to be written after tuner.py is built
 - **Opened:** 2026-05-11
 
+
+**Feature Engineering (v2 candidates)**
+
+### Q7: Should `naicscode` be re-introduced as a bucketed industry feature?
+- **Status:** 🔴 Open
+- **Surfaced in:** ADR 017
+- **What we did:** Excluded `naicscode` from v1 features. Its raw 6-digit cardinality (thousands of unique codes) would flood the one-hot encoded feature space.
+- **Reason given at the time:** Industry information likely carries real predictive signal (restaurants and medical practices have different default rates) but the raw column is unusable without engineering. v2 work — bucket at 2-digit (~20 sectors) or 3-digit (~100 subsectors) level.
+- **Where the answer lives:** Géron Ch. 2 (binning and bucketing); the NAICS hierarchy documentation directly; v2 experiment comparing 2-digit and 3-digit aggregation against v1 baseline.
+- **Opened:** 2026-05-15
+
+
+
+
+### Q8: Should bank-level historical features be engineered from `bankfdicnumber`?
+- **Status:** 🔴 Open
+- **Surfaced in:** ADR 017
+- **What we did:** Excluded `bankfdicnumber` from v1 features. Hundreds of unique values, no useful raw treatment.
+- **Reason given at the time:** Could be engineered into bank-level features — origination volume, historical default rate, average loan size by bank. These would generalise where the raw identifier doesn't. Careful target-leakage management needed (the bank's historical default rate must be computed only on past, resolved loans, not the loan currently being scored).
+- **Where the answer lives:** Zheng "Feature Engineering for Machine Learning" Ch. 7 (target encoding, mean encoding, and the leakage traps that come with them).
+- **Opened:** 2026-05-15
+
+
+
+
+### Q9: Should date-derived features be engineered?
+- **Status:** 🔴 Open
+- **Surfaced in:** ADR 017
+- **What we did:** Excluded all date columns from v1. `approvaldate` and `firstdisbursementdate` are not available pre-approval. `asofdate` carries no signal. `approvalfy` was excluded as a temporal proxy.
+- **Reason given at the time:** If drift monitoring reveals that temporal patterns matter — economic cycles, seasonality, post-COVID effects — date-derived features could be engineered (year buckets, days-between-events, month-of-year). For v1, the drift pipeline is responsible for handling temporal effects.
+- **Where the answer lives:** Géron Ch. 2 (date feature engineering); the drift detection results from v1 itself, once deployed.
+- **Opened:** 2026-05-15
+
+
+
+### Q10: Are `subprogram` and `processingmethod` redundant?
+- **Status:** 🔴 Open
+- **Surfaced in:** ADR 017
+- **What we did:** Kept both features for v1, accepted potential redundancy.
+- **Reason given at the time:** Both describe "what kind of 7(a) loan is this." Without inspecting co-occurrence in the actual data, we couldn't tell whether they carry overlapping information. v1 keeps both — multicollinearity doesn't bother tree-based models, and may only weakly affect logistic regression at small dataset sizes.
+- **Where the answer lives:** Inspect the data directly (cross-tab of `subprogram` × `processingmethod`); compare feature importances from the random forest run; ISLP Ch. 6 on collinearity in linear models.
+- **Opened:** 2026-05-15
+
+
+
+
+###  **Governance & Fairness**
+ 
+### Q11: Should geographic features be re-introduced after fairness analysis?
+- **Status:** 🔴 Open
+- **Depends on:** Q12
+- **Surfaced in:** ADR 017
+- **What we did:** Excluded `borrstate`, `projectstate`, and `sbadistrictoffice` from v1 features.
+- **Reason given at the time:** Manageable cardinality (~50 US states, ~70 SBA district offices), but geographic features in credit decisions can act as proxies for protected attributes like race. Re-introduction requires a formal fairness analysis the project is not yet equipped to do.
+- **Where the answer lives:** Q12's resolution must come first. After that, v2 PR with a fairness analysis ADR comparing the v1 baseline against a model with geographic features included.
+- **Opened:** 2026-05-15
+
+
+### Q12: What is the fairness review process for any feature that could proxy for protected attributes?
+- **Status:** 🔴 Open
+- **Blocks:** Q11
+- **Surfaced in:** ADR 017
+- **What we did:** Did not establish a fairness review process for v1. Excluded geographic features rather than introduce features without one.
+- **Reason given at the time:** A fairness analysis is a governance artifact, not a code artifact. It requires deciding what protected attributes are relevant (race, gender, age, national origin), what disparate-impact metrics to compute (equal opportunity, demographic parity, predictive parity), and what threshold of disparity is acceptable. v1 ships without this; the analysis is a precondition for any feature that could proxy for a protected attribute.
+- **Where the answer lives:** Berlin/EU regulatory guidance on fair lending (GDPR, AI Act); academic literature on fairness metrics in ML (Barocas, Hardt, Narayanan); existing fairness analysis frameworks from regulated fintechs.
+- **Opened:** 2026-05-15
+
+
+
+ **Feature Availability (clarification needed)**
+ 
+### Q13: What does `soldsecmrktind` represent — origination intent or post-origination outcome?
+- **Status:** 🔴 Open
+- **Surfaced in:** ADR 017
+- **What we did:** Excluded `soldsecmrktind` from v1 features conservatively.
+- **Reason given at the time:** Could represent the lender's intent at origination to sell the loan into the secondary market (available at prediction time, usable as a feature) or could represent whether the loan was actually sold at some later point (post-origination, leakage). The SBA data dictionary entry is ambiguous on this point. v1 excludes it; if the semantics are clarified and it represents intent, v2 could re-introduce it.
+- **Where the answer lives:** SBA 7(a) data dictionary detail page for `soldsecmrktind`; SBA loan origination process documentation; possibly contact SBA data steward directly.
+- **Opened:** 2026-05-15
+
+
+
 ## Closed Questions
 
-*(none yet — answered questions move here with their full resolved form)*
+### Q1: Should every feature be used, or should some be pruned?
+- **Status:** 🟢 Closed
+- **Resolved by:** ADR 017
+- **Surfaced in:** `src/models/trainer.py`
+- **What we decided:** Of the 42 columns in the schema, 12 are used as features for v1. One is the target. 29 are excluded.
+- **Reasoning:** A column has to pass four checks to make it into v1 — available at prediction time, has enough variation to carry signal, cardinality is manageable, no governance concerns we can't yet handle. Exclusions group naturally: outcome columns (target leakage), identifiers (no generalisation), geographic features (fairness governance deferred), date columns (not available pre-approval), temporal proxies, columns with no variation, and one column whose semantics are unclear.
+- **Alternatives considered:**
+  - *Use all features.* Rejected — would have introduced target leakage from outcome columns and flooded the feature space with high-cardinality identifiers.
+  - *Use only obviously numerical columns.* Rejected — too restrictive, would have dropped real categorical signals like `subprogram` and `businessage`.
+  - *Engineer features now (NAICS bucketing, geographic features after fairness review).* Deferred to v2. Adding feature engineering before the v1 baseline exists makes future improvements unevaluable.
+- **When this resolution holds:** For v1, against the SBA 7(a) loan data, for a pre-approval binary classification model.
+- **When to revisit:** Each v2 PR adds or modifies features against a measured v1 baseline. Q9–Q13 below are the open v2 feature questions opened by ADR 017.
+- **Connections:**
+  - ADR 016 establishes `dataset_builder.py` as the file where these decisions live.
+  - ADR 017 documents the full feature list with per-column reasoning.
+  - The drift detection pipeline this project builds will catch when the v1 feature set stops being adequate — that's the signal to revisit, not abstract claims about what "should" help.
+- **Opened:** 2026-05-11
+- **Closed:** 2026-05-15
+
+---
+
+### Q2: Why are certain columns treated as numerical vs categorical?
+- **Status:** 🟢 Closed
+- **Resolved by:** ADR 017
+- **Surfaced in:** `src/models/trainer.py`
+- **What we decided:** Within the 12 v1 features, 5 are numerical (scaled) and 7 are categorical (one-hot encoded). The dtype declared in `schema.py` does not automatically determine the modelling treatment.
+- **Reasoning:** The schema declares dtype — what Python type best represents the column. The model layer declares semantic role — whether a column is a continuous quantity the model should reason about linearly, or a category the model should treat as discrete. These can disagree. `revolverstatus` is integer-typed but is a 0/1 flag, so it's categorical for modelling. `jobssupported` is integer-typed and is a genuinely continuous quantity (10 jobs is meaningfully twice 5 jobs), so it's numerical. `terminmonths` is the same case as `jobssupported`.
+- **Alternatives considered:**
+  - *Derive feature groups mechanically from `STRING_COLUMNS`, `INTEGER_COLUMNS`, `FLOAT_COLUMNS`.* Rejected — would have treated `revolverstatus` as numerical (wrong) and `approvalfy` as a meaningful continuous feature (wrong). Mechanical derivation cannot tell flags apart from quantities.
+  - *Treat everything as categorical.* Rejected — destroys the actual continuous signal in columns like `grossapproval` and `initialinterestrate`.
+  - *Treat everything as numerical.* Rejected — categorical features like `businesstype` and `processingmethod` have no meaningful ordering or scale.
+- **When this resolution holds:** For v1, for the current 12 features, with `StandardScaler` and `OneHotEncoder`.
+- **When to revisit:** When v2 feature engineering changes which columns are features, or if Q4 (preprocessing across model families) closes and tree-based models stop needing the same preprocessing as logistic regression.
+- **Connections:**
+  - ADR 017 documents the specific groupings.
+  - Q4 (is `StandardScaler + OneHotEncoder` appropriate for all three model families?) remains open and could shift this in v2.
+  - The `NUMERICAL_FEATURES` and `CATEGORICAL_FEATURES` constants in `dataset_builder.py` are the single source of truth for these groupings — both `trainer.py` and `tuner.py` import from there.
+- **Opened:** 2026-05-11
+- **Closed:** 2026-05-15
+---
