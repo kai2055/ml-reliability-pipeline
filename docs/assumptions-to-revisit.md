@@ -95,40 +95,9 @@ Status legend:
 ---
 
 
-## Cross-Validation Strategy
 
-### Q6: Why stratified k-fold over random k-fold, and why k=5?
-- **Status:** 🔴 Open — decided conceptually, ADR pending after tuner code
-- **Surfaced in:** `src/models/tuner.py` (pre-build session)
-- **What we decided:** Stratified k-fold cross-validation with k=5
-- **Reason — stratified over random:**
-  Credit risk is imbalanced at Datatroniq — roughly 80% repay, 20%
-  default. Random k-fold can produce chunks with skewed class
-  proportions, distorting the cross-validation result for one fold
-  relative to another. Stratified k-fold constructs each chunk to
-  preserve the original class proportions. Every fold has roughly the
-  same repay/default ratio. Scores across folds become comparable.
-- **Reason — k=5 over alternatives:**
-  k=2 trains each model on only 50% of available data and averages
-  only two scores — both underestimate performance and amplify noise.
-  k=100 explodes compute by 100x, produces nearly-identical training
-  sets across rounds (highly correlated scores), and gives tiny
-  validation sets that are themselves noisy. k=5 trains on 80% of
-  data, validates on 20%, averages five reasonably independent scores
-  — the standard default. k=10 is the next reasonable choice when
-  stability matters more than compute time, but k=5 is enough for
-  Datatroniq's scale.
-- **Why this matters at Datatroniq:** A model selected via
-  unstratified CV on imbalanced data may look good in aggregate while
-  silently performing poorly on the minority class — exactly the
-  defaulters the model is supposed to identify. The cross-validation
-  procedure itself becomes a source of silent degradation if not
-  chosen with the class imbalance in mind.
-- **Where the answer lives:** Géron Ch. 2 (cross-validation in
-  practice); ISLP Ch. 5 (resampling methods — k-fold, LOOCV, the
-  bias-variance tradeoff of k)
-- **ADR status:** Pending — to be written after tuner.py is built
-- **Opened:** 2026-05-11
+
+
 
 
 **Feature Engineering (v2 candidates)**
@@ -253,3 +222,30 @@ Status legend:
 - **Opened:** 2026-05-11
 - **Closed:** 2026-05-15
 ---
+
+
+
+
+## Cross-Validation Strategy
+
+### Q6: Why stratified k-fold over random k-fold, and why k=5?
+- **Status:** 🟢 Closed
+- **Resolved by:** ADR 018
+- **Surfaced in:** `src/models/tuner.py`
+- **What we decided:** Stratified k-fold cross-validation with k=5, shuffle=True, random_state=42. Defined as a module-level constant `CV` in `tuner.py`, shared across all tuning configs.
+- **Reasoning:**
+  - *Stratified over random:* The target classes are imbalanced (pif majority, chgoff minority). Random k-fold can produce folds with skewed class proportions, distorting cross-validation results fold to fold. Stratified k-fold preserves the class ratio in every fold so scores across folds are comparable.
+  - *k=5:* k=5 trains each model on 80% of the data and averages five reasonably independent scores — the conventional default for a reason. k=3 produces high-variance estimates over too few folds. k=10 doubles compute cost for marginal accuracy gain. The SBA dataset is large enough that 5 folds give stable estimates, and Random search with n_iter=20 × 5 folds = 100 fits is already a substantial compute budget.
+  - *shuffle=True:* Without shuffling, `StratifiedKFold` preserves row order within strata. SBA loan data has temporal structure (applications come in over time); unshuffled folds can introduce subtle leakage where earlier rows train and later rows test. Shuffling breaks this.
+- **Alternatives considered:**
+  - *Random (unstratified) k-fold.* Rejected — on imbalanced data, fold class ratios can drift, inflating CV variance and silently degrading the metric estimate for the minority class.
+  - *k=10 instead of k=5.* Considered. Marginal stability gain, 2× compute cost. k=5 chosen as the sufficient default; k=10 remains a reasonable v2 option if stability becomes a concrete concern.
+  - *Time-series CV (e.g. `TimeSeriesSplit`).* Deferred to v2. Could matter if drift monitoring surfaces temporal patterns that v1 CV is not respecting. Not tied to a specific feedback loop in v1's design, so YAGNI applies.
+- **When this resolution holds:** For v1, for the current binary classification target, with the SBA dataset's class imbalance and (assumed) IID-within-stratum behaviour.
+- **When to revisit:** When v2 drift monitoring suggests temporal effects matter (move to time-series CV); when class imbalance shifts substantially (re-validate stratification assumptions); when compute budget allows k=10 to be evaluated against k=5.
+- **Connections:**
+  - ADR 018 documents the full tuning architecture including the CV choice.
+  - The `CV` constant in `tuner.py` is the single source of truth — all three tuning configs share it.
+  - This decision is structurally separate from `scoring` (Q5 / ADR 015 / ADR 018) — scoring is per-config policy, CV is shared mechanics. The split is documented in ADR 018, decision 9.
+- **Opened:** 2026-05-11
+- **Closed:** 2026-05-17
