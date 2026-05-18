@@ -58,7 +58,8 @@ XGB_TUNING_CONFIG = TuningConfig(
             random_state=42,
             n_jobs=-1,
             eval_metric="logloss",
-            use_label_encoder=False,
+            # use_label_encoder removed in recent xgboost versions; previously
+            # silenced a deprecation warning that no longer applies
         ),
     ),
     search_class=RandomizedSearchCV,
