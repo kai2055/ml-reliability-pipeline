@@ -13,13 +13,13 @@ LOGREG_TUNING_CONFIG = TuningConfig(
     pipeline=build_pipeline(
         NUMERICAL_FEATURES,
         CATEGORICAL_FEATURES,
-        LogisticRegression(solver="liblinear", max_iter=1000, random_state=42),
+        LogisticRegression(solver="saga", max_iter=2000, random_state=42),
         
     ),
     search_class=GridSearchCV,
     param_space={
         "model__C": [0.01, 0.1, 1.0, 10.0, 100.0],
-        "model__penalty": ["l1", "l2"],
+        "model__l1_ratio": [0.0, 1.0],
         "model__class_weight": [None, "balanced"],
     },
     scoring="roc_auc",
