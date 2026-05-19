@@ -62,7 +62,7 @@ Status legend:
 ## Evaluation Metrics
 
 ### Q5: Which metrics should evaluator.py compute, and why those four?
-- **Status:** 🔴 Open — decided conceptually, ADR pending after code
+- **Status:** 🔴 Open — partially closed; broader metrics debate remains open
 - **Surfaced in:** `src/models/evaluator.py` (pre-build session)
 - **What we decided:** Four metrics — Precision, Recall, AUC, Log Loss
 - **Reason for each:**
@@ -89,7 +89,14 @@ Status legend:
 - **Where the answer lives:** Zheng — Evaluating Machine Learning
   Models (the whole book is relevant here); Géron Ch. 3 (classification
   metrics in practice)
-- **ADR status:** Pending — to be written after evaluator.py is built
+- **ADR status:** ADR 015 documented the evaluator's metric choices for
+  v1. ADR 021 (model selection and threshold policy) closes the
+  threshold-setting subset of this question by establishing expected
+  cost as the selection criterion and a vectorised threshold sweep as
+  the mechanism. The broader debate — whether the v1 metric set is
+  sufficient as monitoring matures, and what additional metrics (e.g.
+  calibration over time, decile lift, KS statistic) should be tracked —
+  remains open.
 - **Opened:** 2026-05-11
 
 ---
@@ -177,6 +184,33 @@ Status legend:
 - **Reason given at the time:** Could represent the lender's intent at origination to sell the loan into the secondary market (available at prediction time, usable as a feature) or could represent whether the loan was actually sold at some later point (post-origination, leakage). The SBA data dictionary entry is ambiguous on this point. v1 excludes it; if the semantics are clarified and it represents intent, v2 could re-introduce it.
 - **Where the answer lives:** SBA 7(a) data dictionary detail page for `soldsecmrktind`; SBA loan origination process documentation; possibly contact SBA data steward directly.
 - **Opened:** 2026-05-15
+
+
+## Threshold Policy & Cost Modelling
+
+These are v2 candidates tied to the monitoring layer's feedback loop. They have concrete change drivers (drift signals), not hypothetical flexibility.
+
+### Q14: How should the cost ratio be re-estimated when business conditions shift?
+- **Status:** 🔴 Open
+- **Surfaced in:** ADR 021
+- **What we did:** Chose a hand-picked cost ratio (`cost_fn=5, cost_fp=1`) for v1 as a documented placeholder. The ratio is recorded on `SelectionResult.cost_ratio` for audit.
+- **Reason given at the time:** Real Datatroniq P&L data doesn't exist (fictional company). Computing from SBA data conflates known loss-given-default with unknown counterfactual revenue. Hand-chosen ratio with documented reasoning is the most honest v1 stance.
+- **Why this matters:** The threshold is a function of the cost ratio. When monitoring detects drift (interest rate changes, recovery rate shifts, regulatory changes), the cost ratio used at v1 selection time may no longer reflect business reality. Without a re-estimation process, the system silently uses a stale assumption.
+- **Where the answer lives:** Banking/credit-risk literature on cost-sensitive learning. FDIC reports on small business lending economics. Conversations with credit-risk practitioners about how operational ratios are re-estimated in production fintechs.
+- **Opened:** 2026-05-21
+
+
+
+### Q15: When does the threshold need re-computation, and how is the new threshold derived?
+- **Status:** 🔴 Open
+- **Depends on:** Q14 (cost ratio must be settled before threshold re-derivation makes sense)
+- **Surfaced in:** ADR 021
+- **What we did:** Computed the v1 threshold by minimising expected cost on FY2010–2019 validation data. The threshold is recorded on `SelectionResult.threshold` for audit.
+- **Reason given at the time:** Threshold-setting is a one-shot decision in v1. The monitoring layer is responsible for detecting when the v1 threshold is no longer appropriate.
+- **Why this matters:** When FY2020+ production data drifts away from training distribution, the model's predicted probabilities become less calibrated. The same threshold value (e.g. 0.27) applied to a model whose probabilities now mean something different produces different decisions than intended. Without a re-computation protocol, this becomes silent degradation by another name.
+- **Constraint:** Any re-computation must not contaminate the test set. A re-derived threshold based on production data is essentially re-tuning — it requires fresh held-out data, a new ADR, and possibly a model retrain.
+- **Where the answer lives:** Drift detection literature on adaptive thresholding. Production ML papers on retraining triggers. The monitoring layer's own output once v1 is deployed will inform this.
+- **Opened:** 2026-05-21
 
 
 
