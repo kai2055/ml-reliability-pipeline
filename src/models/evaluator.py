@@ -71,8 +71,14 @@ def evaluate(y_true: pd.Series, predictions: pd.DataFrame) -> dict:
     """
 
     return {
-        "precision": precision_score(y_true, predictions["predicted_label"]),
-        "recall": recall_score(y_true, predictions["predicted_label"]),
+        "precision": precision_score(y_true, predictions["predicted_label"], zero_division=0),
+
+        # zero_division=0: when no positives are predicted, precision/recall are
+        # undefined; we treat them as 0 rather than raising or emitting warnings.
+        
+        "recall": recall_score(y_true, predictions["predicted_label"], zero_division=0),
+
+
         "roc_auc": roc_auc_score(y_true, predictions["predicted_proba"]),
         "log_loss": log_loss(y_true, predictions["predicted_proba"]),
         "brier_score": brier_score_loss(y_true, predictions["predicted_proba"]),
