@@ -89,3 +89,71 @@ def tiny_random_config():
         scoring="roc_auc",
         n_iter=3,
     )
+
+
+
+@pytest.fixture
+def fitted_tuning_results(tiny_xy):
+    """
+    Three fitted TuningResults with predictably different behaviors.
+
+    Model A: DummyClassifier(stratrgy="most_frequent") -> always predicts
+              the majority class. AUC 0.5
+
+    Model B: DummyClassifier(strategy-"stratified") -> random predictions
+             respecting class balance. AUC 0.5
+
+    Model C: LogisticRegression(solver="saga", max_iter=2000
+             random_state=42, C=0.1) -> real classifier, should 
+             beat both dummies comfortable.
+
+    The fixture provides a known winner (Model C) and two closely-matched
+    dummies that can be forces to tie on cost by tweaking cost_fn/cost_fp 
+    
+    """
+
+    from sklearn.dummy import DummyClassifier
+    from sklearn.linear_model import LogisticRegression
+
+    from src.models.trainer import build_pipeline
+    from src.models.dataset_builder import NUMERICAL_FEATURES, CATEGORICAL_FEATURES
+    from src.models.tuner import TuningResult, SearchMetadata
+
+    X, y = tiny_xy
+    results: dict[str, TuningResult] = {}
+
+    for name, model in [
+        ("model_a", DummyClassifier(strategy="most_frequent")),
+        ("model_b", DummyClassifier(strategy="stratified", random_state=42)),
+        ("model_c", LogisticRegression(solver="saga", max_iter=2000, random_state=42, C=0.1)),
+    ]:
+        pipeline = build_pipeline(
+            NUMERICAL_FEATURES, CATEGORICAL_FEATURES, model
+        )
+        pipeline.fit(X, y)
+
+
+        # Minimal metadata that satifies the dataclass contract
+        metadata = SearchMetadata(
+            search_strategy="GridSearchCV",
+            param_space={},
+            scoring="roc_auc",
+            cv_strategy="StratifiedKFold(n_splits=2)",
+            n_candidates=1,
+            n_fits=2,
+            n_iter=None,
+            random_state=42,
+            started_at="2026-01-01T00:00:00+00:00",
+            duration_seconds=0.1
+        )
+
+        results[name] = TuningResult(
+            best_estimator=pipeline,
+            best_params={},
+            best_score=0.5,
+            cv_results={},
+            search_metadata=metadata
+        )
+
+
+    return results
