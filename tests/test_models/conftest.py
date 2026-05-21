@@ -157,3 +157,49 @@ def fitted_tuning_results(tiny_xy):
 
 
     return results
+
+
+@pytest.fixture
+def sample_selection_result(tiny_xy):
+    """
+    A minimal SelectionResult backed by a fitted LogisticRegression on tiny_xy
+    
+    """
+    from sklearn.linear_model import LogisticRegression
+    from src.models.trainer import build_pipeline
+    from src.models.dataset_builder import NUMERICAL_FEATURES, CATEGORICAL_FEATURES
+    from src.models.selector import SelectionResult, SelectionMetadata
+
+    X, y = tiny_xy
+    pipeline = build_pipeline(
+        NUMERICAL_FEATURES, CATEGORICAL_FEATURES,
+        LogisticRegression(solver="saga", max_iter=2000, random_state=42)
+
+    )
+    pipeline.fit(X, y)
+
+    metadata = SelectionMetadata(
+        run_started_at="2026-01-01T00:00:00+00:00",
+        run_duration_seconds=1.0,
+        n_candidates_considered=1,
+        candidate_names=["test_model"],
+        validation_set_size=len(y),
+        threshold_search_grid="0.01..0.99 step 0.01",
+    )
+
+    return SelectionResult(
+        best_estimator=pipeline,
+        best_model_name="test_model",
+        threshold=0.42,
+        cost_ratio=(5.0, 1.0),
+        validation_metrics={
+            "precision": 0.6,
+            "recall": 0.5,
+            "roc_auc": 0.8,
+            "log_loss": 0.4,
+            "brier_score": 0.1,
+            "expected_cost": 10.0,
+        },
+        comparison={},
+        selection_metadata=metadata,
+    )
