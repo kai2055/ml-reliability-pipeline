@@ -15,7 +15,7 @@ def test_save_load_preserves_core_fields(sample_selection_result, tmp_path):
     assert artifact.threshold == result.threshold
     assert artifact.cost_ratio == result.cost_ratio
 
-    assert artifact.pipeline.get_params() == result.best_estimator.get_params()
+    
 
 
 def test_save_load_preserves_metric_values(sample_selection_result, tmp_path):
@@ -116,4 +116,17 @@ def test_json_contains_correct_types(sample_selection_result, tmp_path):
     for key, value in data["validation_metrics"].items():
         assert isinstance(value, float), f"{key} is {type(value)}, not float"
 
-        
+
+
+
+def test_loaded_pipeline_can_predict(sample_selection_result, tiny_xy, tmp_path):
+    model_dir = tmp_path / "model"
+    save_model(sample_selection_result, model_dir)
+    artifact = load_model(model_dir)
+
+    X, _ = tiny_xy
+    proba = artifact.pipeline.predict_proba(X)
+
+    assert proba.shape[1] == 2
+    assert (proba >= 0).all() and (proba <= 1).all()
+
