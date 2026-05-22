@@ -212,6 +212,29 @@ These are v2 candidates tied to the monitoring layer's feedback loop. They have 
 - **Where the answer lives:** Drift detection literature on adaptive thresholding. Production ML papers on retraining triggers. The monitoring layer's own output once v1 is deployed will inform this.
 - **Opened:** 2026-05-21
 
+## Drift Detection (v2 candidates)
+
+Questions opened by ADR 023. These concern detection capabilities and
+alerting policy deferred beyond v1's data-drift scope.
+
+### Q16: How should concept drift be detected once ground-truth outcomes arrive?
+- **Status:** 🔴 Open
+- **Surfaced in:** ADR 023
+- **What we did:** Scoped v1's monitoring to data drift only — PSI and Wasserstein compare input feature distributions (`P(X)`). Concept drift (`P(y|X)` — the same applicant profile defaulting at a different rate) is a stated, deliberate blind spot.
+- **Reason given at the time:** Concept drift detection requires ground-truth loan outcomes, which in credit lending materialise months to years after origination. A v1 concept-drift detector would always be reporting on a world long past. Data drift detection serves as an early-warning proxy instead.
+- **Why this matters:** COVID produced both data drift and concept drift in the SBA data. v1 catches the data drift loudly, but the underlying input-outcome shift is invisible to PSI and Wasserstein. A complete reliability picture eventually needs concept-drift detection.
+- **Concrete change driver:** The arrival of resolved-loan outcomes for FY2020+ data — once loans have paid off or charged off, `P(y|X)` becomes measurable.
+- **Where the answer lives:** Literature on concept drift detection (performance-based monitoring, delayed-label methods); the project's own FY2020+ outcomes once they resolve.
+- **Opened:** 2026-05-22
+
+### Q17: What drift thresholds and alerting policy should the monitoring layer use?
+- **Status:** 🔴 Open
+- **Surfaced in:** ADR 023
+- **What we did:** ADR 023 fixed the drift *metrics* — PSI for all features, std-normalised Wasserstein for numerical features — but not the *thresholds* at which an alert fires, nor how per-feature drift aggregates into a system-level signal.
+- **Reason given at the time:** Threshold and alerting choices are monitoring-layer policy, not baseline-saver concerns. ADR 023's job was to fix what the baseline stores and what metrics consume it; the alerting policy belongs with the monitoring layer's own design.
+- **Why this matters:** PSI has conventional interpretability bands (~0.1, ~0.25), but std-normalised Wasserstein has no such established bands and needs a threshold chosen deliberately. Per-feature drift also needs an aggregation rule — does one drifted feature flag the system, or several?
+- **Where the answer lives:** To be settled when the monitoring layer is designed and built — likely its own ADR.
+- **Opened:** 2026-05-22
 
 
 ## Closed Questions
