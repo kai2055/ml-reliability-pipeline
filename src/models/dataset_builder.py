@@ -78,6 +78,11 @@ def _select_features(df: pd.DataFrame) -> pd.DataFrame:
     return df[feature_columns].copy()
 
 
+def _fill_missing_categoricals(df: pd.DataFrame) -> pd.DataFrame:
+    for col in CATEGORICAL_FEATURES:
+        df[col] = df[col].fillna("missing")
+    return df
+
 
 def build_dataset(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
     """
@@ -102,4 +107,5 @@ def build_dataset(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
     df = _filter_rows(df)
     df, y = _derive_target(df)
     X = _select_features(df)
+    X = _fill_missing_categoricals(X)
     return X, y
