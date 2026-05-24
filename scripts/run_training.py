@@ -104,16 +104,29 @@ def _run_fatal_checks(df: pd.DataFrame) -> None:
     
 
 
-def run_training() -> None:
-    """Execute the full training pipeline end to end."""
+def run_training(
+        data_path: Path,
+        model_dir: Path,
+        baseline_dir: Path,
+        cost_fn: float,
+        cost_fp: float,
+        mlflow_experiment: str,
+) -> None:
+    """
+    Execute the full training pipeline end to end.
+
+    Parameters are explicit testing seam. Production invocation is fixed:
+    the __main__ block always calls this with the module-level config constants.
+    
+    """
     run_start = time.time()
-    mlflow.set_experiment(MLFLOW_EXPERIMENT)
+    mlflow.set_experiment(mlflow_experiment)
     run_name = f"training_{datetime.now(timezone.utc).strftime('%Y-%m-%d_%H-%M-%S')}"
 
     with mlflow.start_run(run_name=run_name):
         #  Load and prepare data ────────────────────────────────
         print("Loading data...")
-        raw_df = load_dataset(DATA_PATH)
+        raw_df = load_dataset(data_path)
         transformed_df = transform(raw_df)
         _run_fatal_checks(transformed_df)
 
@@ -129,14 +142,14 @@ def run_training() -> None:
         # Logged before tuning so a run that crashes mid-training
         # still records what it was attempting.
         mlflow.log_params({
-            "data_path": str(DATA_PATH),
+            "data_path": str(data_path),
             "n_rows_raw": len(raw_df),
             "n_rows_transformed": len(transformed_df),
             "n_train": len(X_train),
             "n_val": len(X_val),
             "n_test": len(X_test),
-            "cost_fn": COST_FN,
-            "cost_fp": COST_FP,
+            "cost_fn": cost_fn,
+            "cost_fp": cost_fp,
         })
 
         # Tune all three model families ────────────────────────
@@ -153,7 +166,7 @@ def run_training() -> None:
         #  Select best model by validation expected cost ────────
         print("Selecting best model...")
         selection = select_best_model(
-            tuning_results, X_val, y_val, cost_fn=COST_FN, cost_fp=COST_FP
+            tuning_results, X_val, y_val, cost_fn=cost_fn, cost_fp=cost_fp
         )
 
         #  Evaluate winner on test set ──────────────────────────
@@ -165,9 +178,9 @@ def run_training() -> None:
 
         # Save artifacts to disk ───────────────────────────────
         print("Saving model and baseline...")
-        save_model(selection, MODEL_DIR, overwrite=True)
+        save_model(selection, model_dir, overwrite=True)
         baseline = compute_baseline(X_train)
-        save_baseline(baseline, BASELINE_DIR, overwrite=True)
+        save_baseline(baseline, baseline_dir, overwrite=True)
 
         #  Log results to MLflow ────────────────────────────────
         # Winning model identity and its tuned hyperparameters.
@@ -199,4 +212,11 @@ def run_training() -> None:
 
 
 if __name__ == "__main__":
-    run_training()
+    run_training(
+        data_path=DATA_PATH,
+        model_dir=MODEL_DIR,
+        baseline_dir=BASELINE_DIR,
+        cost_fn=COST_FN,
+        cost_fp=COST_FP,
+        mlflow_experiment=MLFLOW_EXPERIMENT,
+    )
