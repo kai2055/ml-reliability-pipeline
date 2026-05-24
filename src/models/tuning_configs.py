@@ -32,11 +32,11 @@ RF_TUNING_CONFIG = TuningConfig(
     pipeline=build_pipeline(
         NUMERICAL_FEATURES,
         CATEGORICAL_FEATURES,
-        RandomForestClassifier(random_state=42, n_jobs=-1),
+        RandomForestClassifier(random_state=42),
     ),
     search_class=RandomizedSearchCV,
     param_space={
-        "model__n_estimators": randint(100, 501),
+        "model__n_estimators": randint(100, 201),
         "model__max_depth": [5, 10, 15, 20, 30, None],
         "model__min_samples_split": randint(2, 21),
         "model__min_samples_leaf": randint(1, 11),
@@ -45,7 +45,7 @@ RF_TUNING_CONFIG = TuningConfig(
 
     },
     scoring="roc_auc",
-    n_iter=20,
+    n_iter=10,
 )
 
 
@@ -56,7 +56,6 @@ XGB_TUNING_CONFIG = TuningConfig(
         CATEGORICAL_FEATURES,
         XGBClassifier(
             random_state=42,
-            n_jobs=-1,
             eval_metric="logloss",
             # use_label_encoder removed in recent xgboost versions; previously
             # silenced a deprecation warning that no longer applies
@@ -75,7 +74,7 @@ XGB_TUNING_CONFIG = TuningConfig(
 
     },
     scoring="roc_auc",
-    n_iter=20,
+    n_iter=10,
 )
 
 
