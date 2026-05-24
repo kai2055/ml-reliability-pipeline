@@ -37,7 +37,7 @@ def build_pipeline(numerical_cols, categorical_cols, model) -> Pipeline:
     preprocessor = ColumnTransformer(
         transformers=[
             ("num", StandardScaler(), numerical_cols),
-            ("cat", OneHotEncoder(), categorical_cols)
+            ("cat", OneHotEncoder(handle_unknown="infrequent_if_exist"), categorical_cols)
         ],
         remainder="drop"
     )
