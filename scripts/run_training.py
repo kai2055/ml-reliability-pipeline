@@ -66,6 +66,7 @@ DATA_PATH = Path("data/raw/sba_7a_2010_2019.csv")
 
 COST_FN = 5.0       # cost of a false negative (approving a defaulter)
 COST_FP = 1.0       # cost of a false positive (rejecting a good applicant)
+USABLE_ROWS_THRESHOLD = 50_000  # data-policy floor (ADR 005)
 
 MODEL_DIR = Path("artifacts/model")
 BASELINE_DIR = Path("data/baseline")
@@ -74,7 +75,7 @@ BASELINE_DIR = Path("data/baseline")
 MLFLOW_EXPERIMENT = "ml-reliability-pipeline"
 
 
-def _run_fatal_checks(df: pd.DataFrame) -> None:
+def _run_fatal_checks(df: pd.DataFrame, absolute_threshold: int) -> None:
     """
     Run the fatal data-quality checks. Raise if any fails
 
@@ -85,7 +86,7 @@ def _run_fatal_checks(df: pd.DataFrame) -> None:
     """
     checks_with_status = {
         "columns": check_columns(df),
-        "usable_rows": check_usable_rows(df),
+        "usable_rows": check_usable_rows(df, absolute_threshold),
         "program_values": check_program_values(df),
     }
     for name, result in checks_with_status.items():
@@ -111,12 +112,13 @@ def run_training(
         cost_fn: float,
         cost_fp: float,
         mlflow_experiment: str,
+        absolute_threshold: int,
 ) -> None:
     """
     Execute the full training pipeline end to end.
 
-    Parameters are explicit testing seam. Production invocation is fixed:
-    the __main__ block always calls this with the module-level config constants.
+    Parameters accept overrides for testing; production uses the 
+    constants defined in the config block at the top of this file
     
     """
     run_start = time.time()
@@ -128,7 +130,7 @@ def run_training(
         print("Loading data...")
         raw_df = load_dataset(data_path)
         transformed_df = transform(raw_df)
-        _run_fatal_checks(transformed_df)
+        _run_fatal_checks(transformed_df, absolute_threshold)
 
         #  Build modelling dataset ──────────────────────────────
         X, y = build_dataset(transformed_df)
@@ -219,4 +221,5 @@ if __name__ == "__main__":
         cost_fn=COST_FN,
         cost_fp=COST_FP,
         mlflow_experiment=MLFLOW_EXPERIMENT,
+        absolute_threshold=USABLE_ROWS_THRESHOLD,
     )

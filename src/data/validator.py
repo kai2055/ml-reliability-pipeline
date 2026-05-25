@@ -37,12 +37,13 @@ def check_columns(df: pd.DataFrame) -> dict:
     }
 
 
-def check_usable_rows(df: pd.DataFrame)-> dict:
+def check_usable_rows(df: pd.DataFrame, absolute_threshold: int = 50_000)-> dict:
     """
     Check that the number of pif and chgoff loan_status_values are above the threshold.
 
     args:
-        df (pd.DataFrame): The dataframe of the dataset 
+        df (pd.DataFrame): The dataframe of the dataset
+        absolute_threshold (int): Minimum number of usable rows required. Defaults to 50,000 
 
     Returns:
         dict with status ('pass' or 'fail'). On both cases, includes 
@@ -51,17 +52,13 @@ def check_usable_rows(df: pd.DataFrame)-> dict:
     
     """
 
-    ABSOLUTE_THRESHOLD = 50_000
     PERCENT_THRESHOLD = 0.12
 
     total_rows = len(df)
-
-    
-
     usable_rows = df["loanstatus"].isin(["pif", "chgoff"]).sum()
     usable_pct = usable_rows / total_rows
 
-    if usable_pct < PERCENT_THRESHOLD or usable_rows < ABSOLUTE_THRESHOLD:
+    if usable_pct < PERCENT_THRESHOLD or usable_rows < absolute_threshold:
         return {
             "status": "fail",
             "details": {
