@@ -109,3 +109,24 @@ def build_dataset(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
     X = _select_features(df)
     X = _fill_missing_categoricals(X)
     return X, y
+
+
+def build_features(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Extract the v1 feature columns from a transformed, validated DataFrame.
+
+    Unlike build_dataset, this function does not filter rows by loanstatus
+    or derive a target. It is used by the monitoring layer, where production
+    loans have not yet resolved to a known outcome.
+
+    Args:
+        df: Clean typed DataFrame from the data layer
+
+    Returns:
+        DataFrame with exactly 12 feature columns (5 numerical, 7 categorical)
+    
+    
+    """
+    X = _select_features(df)
+    X = _fill_missing_categoricals(X)
+    return X
