@@ -33,6 +33,7 @@ from src.data.validator import (
     check_usable_rows,
     check_program_values,
     check_required_columns,
+    run_fatal_checks,
 )
 
 
@@ -75,33 +76,7 @@ BASELINE_DIR = Path("data/baseline")
 MLFLOW_EXPERIMENT = "ml-reliability-pipeline"
 
 
-def _run_fatal_checks(df: pd.DataFrame, absolute_threshold: int) -> None:
-    """
-    Run the fatal data-quality checks. Raise if any fails
 
-    Fatal checks gate the pipeline: if the data does not clear them,
-    training must not proceed
-    
-    
-    """
-    checks_with_status = {
-        "columns": check_columns(df),
-        "usable_rows": check_usable_rows(df, absolute_threshold),
-        "program_values": check_program_values(df),
-    }
-    for name, result in checks_with_status.items():
-        if result["status"]  == "fail":
-            raise ValueError(
-                f"Fatal data check '{name}' failed: {result.get('details',{})}"
-
-            )
-        
-
-    required_violations = check_required_columns(df)
-    if required_violations:
-        raise ValueError(
-            f"Fatal data check 'required_columns' failed: {required_violations}"
-        )
     
 
 
@@ -130,7 +105,7 @@ def run_training(
         print("Loading data...")
         raw_df = load_dataset(data_path)
         transformed_df = transform(raw_df)
-        _run_fatal_checks(transformed_df, absolute_threshold)
+        run_fatal_checks(transformed_df, absolute_threshold)
 
         #  Build modelling dataset ──────────────────────────────
         X, y = build_dataset(transformed_df)
