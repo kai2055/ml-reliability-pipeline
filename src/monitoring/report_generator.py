@@ -5,7 +5,7 @@ from typing import Optional
 from src.monitoring.drift_detector import FeatureDriftResult
 from src.monitoring.drift_policy import (
     PSI_MODERATE, PSI_SIGNIFICANT,
-    WASSERSTEIN_MODERATE, WASSERSTEIN_SIGNITFICANT,
+    WASSERSTEIN_MODERATE, WASSERSTEIN_SIGNIFICANT,
     classify_severity,
 )
 
@@ -48,7 +48,7 @@ def _psi_severity(psi: float) -> str:
 def _wasserstein_severity(wasserstein: Optional[float]) -> Optional[str]:
     if wasserstein is None:
         return None
-    return classify_severity(wasserstein, WASSERSTEIN_MODERATE, WASSERSTEIN_SIGNITFICANT)
+    return classify_severity(wasserstein, WASSERSTEIN_MODERATE, WASSERSTEIN_SIGNIFICANT)
 
 
 
@@ -56,7 +56,7 @@ def _wasserstein_severity(wasserstein: Optional[float]) -> Optional[str]:
 
 # Main function
 
-def generate_report(results: list[FeatureDriftDetail]) -> DriftReport:
+def generate_report(results: list[FeatureDriftResult]) -> DriftReport:
     """
     Convert raw drift results into a structured, human-readable report.
 
