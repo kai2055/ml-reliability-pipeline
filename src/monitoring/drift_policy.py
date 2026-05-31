@@ -16,12 +16,12 @@ PSI_SIGNIFICANT = 0.25  # below this is "moderate", above is "significant"
 
 # Wasserstein - units of training standard deviation
 WASSERSTEIN_MODERATE = 0.3
-WASSERSTEIN_SIGNITFICANT = 0.8
+WASSERSTEIN_SIGNIFICANT = 0.8
 
 def classify_severity(value: float, moderate:float, significant:float) -> str:
     if value < moderate:
         return "low"
-    if value < "significant":
+    if value < significant:
         return "moderate"
     return "significant"
 
