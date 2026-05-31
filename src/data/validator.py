@@ -151,6 +151,33 @@ def check_required_columns(df: pd.DataFrame) -> dict:
     }
 
 
+def run_fatal_checks(df: pd.DataFrame, absolute_threshold: int = 50_000, include_usable_rows: bool = True) -> None:
+    """
+    Run the fatal data-quality checks. Raise if any fails
+    """ 
+    checks_with_status = {
+        "columns": check_columns(df),
+        "program_values": check_program_values(df),
+    }
+    if include_usable_rows:
+        checks_with_status["usable_rows"] = check_usable_rows(df, absolute_threshold)
+
+    for name, result in checks_with_status.items():
+        if result["status"] == "fail":
+            raise ValueError(
+                f"Fatal data check '{name}' failed: {result.get('details', {})}"
+
+            )
+        
+    required_violations = check_required_columns(df)
+    if required_violations:
+        raise ValueError(
+            f"Fatal data check 'required_columns' failed: {required_violations}"
+        )
+    
+
+    
+
 
 
 
