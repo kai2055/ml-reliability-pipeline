@@ -18,7 +18,7 @@ N_PSI_BINS = 10             # equal-frequecy bins for numerical PSI
 PSI_EPSILON = 1e-4          # floor for zero fraction in pSI formula
 
 
-class FeaturMismatchError(Exception):
+class FeatureMismatchError(Exception):
     """
     Raised when production data is missing features present in the baseline.
     """
@@ -150,7 +150,7 @@ def detect_drift(
     # Missing features -> fatal
     missing = (baseline_numerical | baseline_categorical) - production_cols
     if missing:
-        raise FeaturMismatchError(
+        raise FeatureMismatchError(
             f"Production data missing baseline features: {sorted(missing)}"
         )
     
