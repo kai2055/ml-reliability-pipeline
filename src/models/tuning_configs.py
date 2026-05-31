@@ -45,7 +45,7 @@ RF_TUNING_CONFIG = TuningConfig(
 
     },
     scoring="roc_auc",
-    n_iter=10,
+    n_iter=20,
 )
 
 
@@ -74,7 +74,7 @@ XGB_TUNING_CONFIG = TuningConfig(
 
     },
     scoring="roc_auc",
-    n_iter=10,
+    n_iter=20,
 )
 
 
