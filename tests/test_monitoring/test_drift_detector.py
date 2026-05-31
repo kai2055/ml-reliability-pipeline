@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 
-from src.monitoring.drift_detector import detect_drift, FeaturMismatchError
+from src.monitoring.drift_detector import detect_drift, FeatureMismatchError
 
 
 
@@ -18,7 +18,7 @@ def test_raises_on_missing_feature():
     }
     production = pd.DataFrame({"other_column": [1, 2, 3]})
 
-    with pytest.raises(FeaturMismatchError, match="income"):
+    with pytest.raises(FeatureMismatchError, match="income"):
         detect_drift(baseline, production)
 
 
