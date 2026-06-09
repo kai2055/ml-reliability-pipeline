@@ -4,11 +4,40 @@
 import pytest
 from fastapi.testclient import TestClient
 from src.api.app import app
+from unittest.mock import MagicMock, patch
 
 @pytest.fixture(scope="module")
 def client():
-    with TestClient(app) as c:
-        yield c
+    mock_model = MagicMock()
+    mock_model.model_name = "xgboost"
+    mock_model.threshold = 0.41
+    mock_model.metadata = {"validation_metrics": {"precision": 0.54, "recall": 0.89}}
+    mock_model.pipeline.predict_proba.return_value = [[0.7, 0.3]]
+
+    mock_baseline = {
+    "numerical": {
+        "grossapproval": {"percentiles": list(range(1, 100)), "std": 1.0, "mean": 50.0, "min": 1.0, "max": 100.0, "missing_fraction": 0.0},
+        "sbaguaranteedapproval": {"percentiles": list(range(1, 100)), "std": 1.0, "mean": 50.0, "min": 1.0, "max": 100.0, "missing_fraction": 0.0},
+        "initialinterestrate": {"percentiles": list(range(1, 100)), "std": 1.0, "mean": 50.0, "min": 1.0, "max": 100.0, "missing_fraction": 0.0},
+        "terminmonths": {"percentiles": list(range(1, 100)), "std": 1.0, "mean": 50.0, "min": 1.0, "max": 100.0, "missing_fraction": 0.0},
+        "jobssupported": {"percentiles": list(range(1, 100)), "std": 1.0, "mean": 50.0, "min": 1.0, "max": 100.0, "missing_fraction": 0.0},
+    },
+    "categorical": {
+        "subprogram": {"guaranty": 1.0},
+        "processingmethod": {"sba express program": 1.0},
+        "fixedorvariableinterestind": {"v": 1.0},
+        "revolverstatus": {"0": 1.0},
+        "businesstype": {"corporation": 1.0},
+        "businessage": {"existing or more than 2 years old": 1.0},
+        "collateralind": {"true": 1.0},
+    },
+    "metadata": {}
+}
+
+    with patch("src.api.app.load_model", return_value=mock_model), \
+         patch("src.api.app.load_baseline", return_value=mock_baseline):
+        with TestClient(app) as c:
+            yield c
 
 
 
