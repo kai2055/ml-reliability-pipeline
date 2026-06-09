@@ -228,13 +228,23 @@ alerting policy deferred beyond v1's data-drift scope.
 - **Opened:** 2026-05-22
 
 ### Q17: What drift thresholds and alerting policy should the monitoring layer use?
-- **Status:** 🔴 Open
+- **Status:** 🟢 Closed
 - **Surfaced in:** ADR 023
+- **Resolved by:** ADR 025
+
 - **What we did:** ADR 023 fixed the drift *metrics* — PSI for all features, std-normalised Wasserstein for numerical features — but not the *thresholds* at which an alert fires, nor how per-feature drift aggregates into a system-level signal.
 - **Reason given at the time:** Threshold and alerting choices are monitoring-layer policy, not baseline-saver concerns. ADR 023's job was to fix what the baseline stores and what metrics consume it; the alerting policy belongs with the monitoring layer's own design.
 - **Why this matters:** PSI has conventional interpretability bands (~0.1, ~0.25), but std-normalised Wasserstein has no such established bands and needs a threshold chosen deliberately. Per-feature drift also needs an aggregation rule — does one drifted feature flag the system, or several?
 - **Where the answer lives:** To be settled when the monitoring layer is designed and built — likely its own ADR.
 - **Opened:** 2026-05-22
+- **What we decided:** PSI thresholds follow industry-standard credit-risk bands:
+  below 0.1 is low, 0.1–0.25 is moderate, above 0.25 is significant.
+  Wasserstein thresholds use 0.3σ and 0.8σ to mirror the same three-level
+  structure. Both are defined as named constants in `drift_policy.py`.
+  Per-feature severity is computed independently; the report sorts worst-first.
+  System-level aggregation (how many drifted features trigger a retraining
+  decision) is deferred to v2 operational context.
+- **Closed:** 2026-06-09
 
 
 ## Closed Questions
