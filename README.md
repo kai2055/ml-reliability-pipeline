@@ -28,6 +28,16 @@ uvicorn src.api.app:app --reload
 ```
 Interactive API documentation available at `http://127.0.0.1:8000/docs`.
 
+## Live API
+
+The API is deployed on GCP Cloud Run and publicly accessible:
+
+**Base URL:** https://ml-reliability-pipeline-1061232555311.europe-west1.run.app
+
+**Interactive documentation:** https://ml-reliability-pipeline-1061232555311.europe-west1.run.app/docs
+
+The `/docs` page lets you explore and call all four endpoints directly from your browser without writing any code.
+
 ## Running Tests
 
 ```bash
