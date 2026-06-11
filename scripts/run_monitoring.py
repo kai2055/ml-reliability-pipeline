@@ -58,6 +58,7 @@ def run_monitoring(
         print("Loading production data....")
         raw_df = load_dataset(production_data_path)
         transformed_df = transform(raw_df)
+        transformed_df = transformed_df.dropna(subset=["initialinterestrate"])
         run_fatal_checks(transformed_df, absolute_threshold, include_usable_rows=False)
 
         production_feeatures = build_features(transformed_df)
