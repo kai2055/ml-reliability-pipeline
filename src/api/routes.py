@@ -2,6 +2,8 @@
 
 import uuid
 import logging
+from typing import Any
+
 import pandas as pd
 from fastapi import APIRouter, HTTPException, Request
 
@@ -33,11 +35,10 @@ router = APIRouter()
 def _build_full_dataframe(loan_dict: dict) -> pd.DataFrame:
     """Create a complete SBA‑shaped DataFrame with defaults for non‑feature columns."""
     n_rows = 1
-    full = {col: ["x"] * n_rows for col in STRING_COLUMNS}
+    full: dict[str, list[Any]] = {col: ["x"] * n_rows for col in STRING_COLUMNS}
     full.update({col: [1] * n_rows for col in INTEGER_COLUMNS})
     full.update({col: [1.0] * n_rows for col in FLOAT_COLUMNS})
     full.update({col: ["1999-02-02"] * n_rows for col in DATE_COLUMNS})
-    # Override with the user‑provided feature values
     full.update(loan_dict)
     return pd.DataFrame(full)
 
@@ -55,7 +56,7 @@ def model_info(request: Request):
     return {
         "model_name": model.model_name,
         "threshold": model.threshold,
-        "validation_metrics": model.validation_metrics,
+        "validation_metrics": model.metadata.get("validation_metrics", {}),
     }
 
 
@@ -67,7 +68,6 @@ def predict(payload: PredictRequest, request: Request):
 
     for loan in payload.loans:
         try:
-            # Build a full DataFrame (all 43 columns) from the single loan
             raw_df = _build_full_dataframe(loan.model_dump())
             transformed_df = transform(raw_df)
 
