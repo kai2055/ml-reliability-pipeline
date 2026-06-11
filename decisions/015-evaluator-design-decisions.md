@@ -12,7 +12,7 @@
 
 Building the evaluator required two decisions: which metrics to compute,
 and how to structure the functions. Both decisions have direct
-consequences for how the risk team at Datatroniq interacts with model
+consequences for how the risk team at Spreekredit interacts with model
 output and how the monitoring layer consumes evaluation results.
 
 ---
@@ -36,7 +36,7 @@ remove that flexibility.
 
 **Four metrics — precision, recall, ROC AUC, log loss and Brier score**
 
-Accuracy was considered and rejected. At Datatroniq, approving a
+Accuracy was considered and rejected. At Spreekredit, approving a
 defaulter is a direct financial loss and rejecting a good applicant is
 missed revenue. These are not symmetric errors. Accuracy treats them as
 equally costly and would hide the asymmetry that actually matters to the

@@ -66,7 +66,7 @@ Status legend:
 - **Surfaced in:** `src/models/evaluator.py` (pre-build session)
 - **What we decided:** Four metrics — Precision, Recall, AUC, Log Loss
 - **Reason for each:**
-  - Precision — of every loan Datatroniq approved, how many actually
+  - Precision — of every loan Spreekredit approved, how many actually
     repaid. Measures the quality of the approval decision itself.
   - Recall — of every applicant who would have repaid, how many did
     the model catch. Measures coverage of good applicants.
@@ -79,7 +79,7 @@ Status legend:
     that says 95% repayment probability and gets a default is punished
     far more than one that said 52%.
 - **Why not accuracy:** Accuracy treats both error types as equally
-  costly. At Datatroniq they are not — approving a defaulter is a
+  costly. At Spreekredit they are not — approving a defaulter is a
   direct financial loss, rejecting a good applicant is missed revenue.
   Accuracy would hide this asymmetry.
 - **Why not just precision and recall:** They only measure the hard
@@ -194,7 +194,7 @@ These are v2 candidates tied to the monitoring layer's feedback loop. They have 
 - **Status:** 🔴 Open
 - **Surfaced in:** ADR 021
 - **What we did:** Chose a hand-picked cost ratio (`cost_fn=5, cost_fp=1`) for v1 as a documented placeholder. The ratio is recorded on `SelectionResult.cost_ratio` for audit.
-- **Reason given at the time:** Real Datatroniq P&L data doesn't exist (fictional company). Computing from SBA data conflates known loss-given-default with unknown counterfactual revenue. Hand-chosen ratio with documented reasoning is the most honest v1 stance.
+- **Reason given at the time:** Real Spreekredit P&L data doesn't exist (fictional company). Computing from SBA data conflates known loss-given-default with unknown counterfactual revenue. Hand-chosen ratio with documented reasoning is the most honest v1 stance.
 - **Why this matters:** The threshold is a function of the cost ratio. When monitoring detects drift (interest rate changes, recovery rate shifts, regulatory changes), the cost ratio used at v1 selection time may no longer reflect business reality. Without a re-estimation process, the system silently uses a stale assumption.
 - **Where the answer lives:** Banking/credit-risk literature on cost-sensitive learning. FDIC reports on small business lending economics. Conversations with credit-risk practitioners about how operational ratios are re-estimated in production fintechs.
 - **Opened:** 2026-05-21

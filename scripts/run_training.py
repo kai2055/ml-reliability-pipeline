@@ -52,7 +52,7 @@ DATA_PATH = Path("data/raw/sba_7a_2010_2019.csv")
 
 
 # Cost ratio for threshold selection (ADR 021)
-# v1 PLACEHOLDER - not derived from Datatroniq financials (fictional company, no P&L).
+# v1 PLACEHOLDER - not derived from Spreekredit financials (fictional company, no P&L).
 # Direction (FN > FP) is principled; magnitude is the  conservative
 # end of the ~5-10x range cited for small-business lending
 # Re-estimation from real cost data is tracked as Q14

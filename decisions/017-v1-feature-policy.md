@@ -98,7 +98,7 @@ These have manageable cardinality, so the technical case is fine. The governance
 **Date columns — no pre-approval availability (3):**
 `asofdate`, `approvaldate`, `firstdisbursementdate`
 
-`asofdate` is a snapshot timestamp — the same value for every row in a given data extract, so no signal. `approvaldate` and `firstdisbursementdate` are recorded at or after approval. Datatroniq's model scores applicants *before* approval, so these don't exist at prediction time.
+`asofdate` is a snapshot timestamp — the same value for every row in a given data extract, so no signal. `approvaldate` and `firstdisbursementdate` are recorded at or after approval. Spreekredit's model scores applicants *before* approval, so these don't exist at prediction time.
 
 **Temporal proxy (1):**
 `approvalfy`

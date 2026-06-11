@@ -55,8 +55,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Datatroniq ML Reliability API",
-    description="Drift detection and credit risk scoring for Datatroniq.",
+    title="Spreekredit ML Reliability API",
+    description="Drift detection and credit risk scoring for Spreekredit.",
     version="1.0.0",
     lifespan=lifespan,
 )

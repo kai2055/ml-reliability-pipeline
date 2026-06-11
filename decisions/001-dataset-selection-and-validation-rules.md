@@ -10,7 +10,7 @@
 
 **What I decided:** Use a real publicly available dataset rather than generating a synthetic one.
 
-**What I considered:** Generating a synthetic dataset tailored to Datatroniq's profile.
+**What I considered:** Generating a synthetic dataset tailored to Spreekredit's profile.
 
 **Why I rejected it:** When you generate synthetic data, you unconsciously make it too clean. You avoid the exact messiness that the validation layer is supposed to catch. That defeats the whole point. I also worried that synthetic data might have unnatural patterns baked in without me even realising it.
 
@@ -23,11 +23,11 @@
 **What I decided:** Use the US Small Business Administration 7(a) FOIA loan dataset, specifically the FY2020–Present file.
 
 **What I considered:**
-1. **Lending Club** — real peer-to-peer lending data, 890k rows, 75 features. I rejected this because it is consumer lending, not small business lending. The applicant is an individual person, not a company. That is a fundamental mismatch with what Datatroniq does.
-2. **SBA 504 program** — also real SBA data but specifically for large fixed-asset purchases like buildings and equipment. I rejected this because Datatroniq does general-purpose small business lending, not fixed-asset financing.
+1. **Lending Club** — real peer-to-peer lending data, 890k rows, 75 features. I rejected this because it is consumer lending, not small business lending. The applicant is an individual person, not a company. That is a fundamental mismatch with what Spreekredit does.
+2. **SBA 504 program** — also real SBA data but specifically for large fixed-asset purchases like buildings and equipment. I rejected this because Spreekredit does general-purpose small business lending, not fixed-asset financing.
 
 **Why I chose 7(a):**
-- It is the closest match to Datatroniq's domain — general-purpose small business loans.
+- It is the closest match to Spreekredit's domain — general-purpose small business loans.
 - It is real and messy in the way government data tends to be — coded fields, inconsistencies, missing values.
 - Most importantly: the FY2020–Present window includes COVID-19. Small businesses were hit hard from March 2020 onward. The type of applicants, the industries, the loan sizes — all of it shifted dramatically. That means there is a real documented drift event sitting inside this dataset, not a simulated one. That is directly useful for the drift detection part of the pipeline.
 
@@ -41,7 +41,7 @@
 
 **Some context:** The `LoanStatus` column has five possible values — `COMMIT`, `PIF` (Paid in Full), `CHGOFF` (Charged Off), `CANCLD` (Cancelled), and `EXEMPT`. EXEMPT means the loan is still active — it has not been paid off, defaulted, or cancelled yet. It is in limbo.
 
-Datatroniq's model is trying to answer one question: will this applicant pay or default? So the only labels that matter are `PIF` and `CHGOFF`. EXEMPT rows have no answer yet.
+Spreekredit's model is trying to answer one question: will this applicant pay or default? So the only labels that matter are `PIF` and `CHGOFF`. EXEMPT rows have no answer yet.
 
 **Why I am excluding EXEMPT rows:**
 - If I include them, the model picks up patterns from loans with no clear outcome, which teaches it something meaningless for the actual prediction task.

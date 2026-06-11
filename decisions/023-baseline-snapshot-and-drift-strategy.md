@@ -51,7 +51,7 @@ The baseline saver and the monitoring layer target **data drift**. They compare 
 
 This is a real limitation and it is stated deliberately rather than hidden. The justification: in credit lending, ground-truth outcomes are unavailable for months or years, so a concept-drift detector would always be reporting on a world long past. Data drift detection is an **early-warning proxy** — when the input distribution shifts substantially, the input–outcome relationship is at risk, and the team is alerted *before* the defaults materialise rather than discovering the degradation from the loss numbers a year later.
 
-For the Datatroniq scenario this is sufficient: the FY2010→FY2020 transition (COVID) produces large, immediately-visible data drift, which is exactly what this system is built to catch.
+For the Spreekredit scenario this is sufficient: the FY2010→FY2020 transition (COVID) produces large, immediately-visible data drift, which is exactly what this system is built to catch.
 
 ### 2. Drift metrics: PSI for all features, Wasserstein (std-normalised) for numerical features
 

@@ -1,8 +1,8 @@
-# Datatroniq ML Reliability Pipeline — Case Study
+# Spreekredit ML Reliability Pipeline — Case Study
 
 ## The Problem: Silent Model Degradation
 
-Datatroniq is a Berlin‑based fintech offering small business loans. Their credit risk model scores loan applicants and predicts default probability. The model was trained on a decade of historical SBA 7(a) loan data — stable, pre‑COVID lending from 2010 to 2019.
+Spreekredit is a Berlin‑based fintech offering small business loans. Their credit risk model scores loan applicants and predicts default probability. The model was trained on a decade of historical SBA 7(a) loan data — stable, pre‑COVID lending from 2010 to 2019.
 
 In early 2020, COVID‑19 disrupted small business lending fundamentally. Government emergency programmes flooded the SBA with applications from businesses that would never have applied before. The profile of applicants changed overnight. Loan sizes shifted. Processing methods changed as the SBA fast‑tracked emergency programmes. Industries that were previously low‑risk became high‑risk.
 
@@ -134,7 +134,7 @@ Emergency loan sizes shifted away from the training distribution.
 
 The monitoring layer raised the alarm on **7 features showing significant drift** — without needing loan outcomes. In credit lending, outcomes take 3–7 years to resolve fully.
 
-By detecting input distribution shift at the point of production data arrival, the pipeline gives the Datatroniq team actionable signal months before the defaults materialise.
+By detecting input distribution shift at the point of production data arrival, the pipeline gives the Spreekredit team actionable signal months before the defaults materialise.
 
 The `initial interest rate` drift alone — 1.46 standard deviations — signals that the macroeconomic regime has changed. A model trained on 6.53% average rates, now scoring applications at near‑zero rates, is operating outside its training distribution in the most consequential feature for credit risk.
 

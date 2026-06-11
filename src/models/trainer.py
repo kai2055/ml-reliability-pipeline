@@ -8,7 +8,7 @@ import joblib
 
 
 
-EXPERIMENT_NAME = "datatroniq-credit-risk"
+EXPERIMENT_NAME = "Spreekredit-credit-risk"
 
 
 

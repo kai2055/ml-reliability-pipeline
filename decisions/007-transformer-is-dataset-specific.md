@@ -21,7 +21,7 @@ The transformer is not a generic utility. It is the bridge between *this* raw da
 
 ## Decision
 
-The transformer is dataset-specific by design. It is written against a specific schema and the conventions of a specific dataset. If Datatroniq ingested a different dataset tomorrow, a new transformer would be written for it, and that is correct, not duplication to be refactored away.
+The transformer is dataset-specific by design. It is written against a specific schema and the conventions of a specific dataset. If Spreekredit ingested a different dataset tomorrow, a new transformer would be written for it, and that is correct, not duplication to be refactored away.
 
 What is generic is the **infrastructure around the transformer** — the validation framework, drift detection logic, MLflow tracking, FastAPI serving layer, deployment pipeline. These components do not care what the data looks like. They operate on whatever the schema and transformer produce.
 

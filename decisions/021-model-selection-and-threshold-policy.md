@@ -76,7 +76,7 @@ In credit risk, FN is typically more expensive than FP — approving someone who
 
 Three sources for these numbers were considered:
 
-- **Real Datatroniq P&L data** — Doesn't exist (fictional company).
+- **Real Spreekredit P&L data** — Doesn't exist (fictional company).
 - **Compute from SBA data directly** — Conflates known loss-given-default (the data has it) with unknown counterfactual revenue from rejected applicants. Asymmetric uncertainty.
 - **Hand-chosen ratio with documented reasoning** (chosen) — Honest about its own placeholder status. Documented in this ADR. Re-estimation is deferred to v2 once monitoring surfaces reasons to update.
 

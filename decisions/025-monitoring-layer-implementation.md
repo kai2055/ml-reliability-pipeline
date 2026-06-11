@@ -124,7 +124,7 @@ are defined as named constants in `drift_policy.py` and imported by
 `report_generator.py` — a single source of truth for policy values.
 
 These thresholds were set by convention and statistical reasoning, not
-derived from Datatroniq's actual cost data. Re-estimation from real
+derived from Spreekredit's actual cost data. Re-estimation from real
 business context is deferred (tracker Q17, carried from ADR 023).
 
 ### 5. `build_features` split from `build_dataset`
@@ -187,7 +187,7 @@ CSV to a structured drift report logged to MLflow — is runnable with
   A future schema-drift check or report entry should surface this
   prominently. Deferred tracker item.
 - **Q17 — drift thresholds** — severity bands are set by convention.
-  Re-estimation from real Datatroniq cost data and operational context
+  Re-estimation from real Spreekredit cost data and operational context
   is deferred, as carried forward from ADR 023.
 - **`include_usable_rows` flag** — the boolean parameter in
   `run_fatal_checks` is a known design trade-off, noted here for
