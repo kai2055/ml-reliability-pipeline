@@ -3,7 +3,7 @@
 
 from fastapi import Request
 from src.models.registry import ModelArtifact
-from src.monitoring.baseline_loader import BaselineLoadError
+
 
 
 def get_model(request: Request) -> ModelArtifact:

@@ -24,17 +24,9 @@ import time
 from datetime import datetime, timezone
 
 import mlflow
-import pandas as pd
-
 from src.data.loader import load_dataset
 from src.data.transformer import transform
-from src.data.validator import (
-    check_columns,
-    check_usable_rows,
-    check_program_values,
-    check_required_columns,
-    run_fatal_checks,
-)
+from src.data.validator import run_fatal_checks
 
 
 from src.models.dataset_builder import build_dataset

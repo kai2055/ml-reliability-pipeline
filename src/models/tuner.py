@@ -7,7 +7,7 @@ from typing import Any
 import pandas as pd
 from sklearn.model_selection import (
     GridSearchCV,
-    RandomizedSearchCV,
+    RandomizedSearchCV, # noqa: F401 - referenced via config.search_class
     StratifiedKFold,
 )
 from sklearn.pipeline import Pipeline

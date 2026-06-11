@@ -2,8 +2,8 @@
 """API route definitions."""
 
 import pandas as pd
-from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, HTTPException, Request
+
 
 from src.api.dependencies import get_model, get_baseline
 from src.api.schemas import (
@@ -14,7 +14,7 @@ from src.api.schemas import (
     FeatureDriftDetail,
 )
 from src.data.transformer import transform
-from src.data.validator import run_fatal_checks, check_columns
+from src.data.validator import run_fatal_checks
 from src.models.dataset_builder import build_features
 from src.monitoring.drift_detector import detect_drift, FeatureMismatchError
 from src.monitoring.report_generator import generate_report
