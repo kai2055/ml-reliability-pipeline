@@ -1,5 +1,4 @@
 
-import pandas as pd
 from src.data.validator import (
     check_columns,
     check_usable_rows,

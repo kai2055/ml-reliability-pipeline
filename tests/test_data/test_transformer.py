@@ -16,7 +16,6 @@ from src.data.transformer import (
 
 from tests.conftest import _make_df
 
-from src.data.schema import STRING_COLUMNS, INTEGER_COLUMNS, FLOAT_COLUMNS, DATE_COLUMNS
 
 
 

@@ -1,5 +1,5 @@
 from src.monitoring.drift_detector import FeatureDriftResult
-from src.monitoring.report_generator import generate_report, DriftReport
+from src.monitoring.report_generator import generate_report
 
 
 def test_summary_counts():
