@@ -7,6 +7,28 @@ An end-to-end ML pipeline for SBA loan default prediction with automated drift m
 
 [![CI](https://github.com/kai2055/ml-reliability-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/kai2055/ml-reliability-pipeline/actions/workflows/ci.yml)
 
+
+
+## Data
+
+The pipeline expects two CSV files in `data/raw/`:
+
+| File | Source | Rows |
+|------|--------|------|
+| `sba_7a_2010_2019.csv` | SBA 7(a) FOIA extracts FY2010–FY2019 | ~545k |
+| `sba_7a_2020_present.csv` | SBA 7(a) FOIA extracts FY2020+ | production window |
+
+**To obtain the data:**
+
+1. Visit the [SBA 7(a) & 504 FOIA data page](https://data.sba.gov/dataset/7-a-504-foia)
+2. Download the CSV extracts for each fiscal year from 2010 to 2019
+3. Concatenate them into a single file and save as `data/raw/sba_7a_2010_2019.csv`
+4. Repeat for the production window (FY2020–present) and save as `data/raw/sba_7a_2020_present.csv`
+
+**Column expectations** are enforced by `src/data/schema.py` — the pipeline fails fast with a clear error if the extract format has drifted.
+
+> *The raw files are not committed to the repository.*
+
 ## Quick Start
 
 ### Install dependencies

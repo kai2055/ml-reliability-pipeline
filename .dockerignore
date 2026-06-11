@@ -1,0 +1,12 @@
+.git
+.github
+tests/
+docs/
+decisions/
+notebooks/
+mlruns/
+data/
+artifacts/
+*.md
+.venv
+__pycache__
