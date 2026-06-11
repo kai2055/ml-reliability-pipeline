@@ -4,7 +4,7 @@ import pandas as pd
 
 
 def load_dataset(path: Path)-> pd.DataFrame:
-    """ Function takes the inital dataset and loads it
+    """ Function takes the initial dataset and loads it
     
         Args:
             path (Path): The path to the dataset
@@ -19,7 +19,7 @@ def load_dataset(path: Path)-> pd.DataFrame:
     
     """
     if not path.exists():
-        raise FileNotFoundError(f"The specifed path does not exist: {path}")
+        raise FileNotFoundError(f"The specified path does not exist: {path}")
     
     if path.is_dir():
         raise IsADirectoryError(f"The given path leads to a directory; not a file: {path}")

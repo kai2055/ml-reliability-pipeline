@@ -136,7 +136,7 @@ def detect_drift(
         production_data: Processed production features (X only)
 
     Returns:
-        One 'FeatureDriftResult' per baseline feature. Wasserstein is 'None' for categorical faetures
+        One 'FeatureDriftResult' per baseline feature. Wasserstein is 'None' for categorical features
     
     Raises:
         FeatureMismatchError: If any baseline feature is absent from the 
@@ -168,12 +168,12 @@ def detect_drift(
     for feature in sorted(baseline_numerical):
         stats = baseline["numerical"][feature]
         psi = _psi_numerical(stats, production_data[feature])
-        wass = _wasserstein_numerical(stats, production_data[feature])
+        was = _wasserstein_numerical(stats, production_data[feature])
         results.append(FeatureDriftResult(
             feature_name=feature,
             feature_type="numerical",
             psi=psi,
-            wasserstein=wass,
+            wasserstein=was,
         ))
 
     # Categorical features

@@ -18,7 +18,7 @@ def _make_production_csv(path: Path, n_rows: int = 300) -> None:
 @pytest.mark.slow
 def test_run_monitoring_integration(tmp_path):
     """Full monitoring pipeline runs end-to-end and returns a DriftReport"""
-    # Arrange - prodcution CSV
+    # Arrange - production CSV
     csv_path = tmp_path / "tiny_production.csv"
     _make_production_csv(csv_path, n_rows=300)
 

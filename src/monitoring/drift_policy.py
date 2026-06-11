@@ -2,7 +2,7 @@
 """
 Drift severity thresholds
 
-PSI thrsholds follow the industry-standard bands used in credit-risk
+PSI thresholds follow the industry-standard bands used in credit-risk
 scorecard monitoring (Basel / CRR-compliant model governance)
 
 Wasserstein thresholds are set to mirror the same three‑level structure

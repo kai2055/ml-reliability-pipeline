@@ -133,7 +133,7 @@ def fitted_tuning_results(tiny_xy):
         pipeline.fit(X, y)
 
 
-        # Minimal metadata that satifies the dataclass contract
+        # Minimal metadata that satisfies the dataclass contract
         metadata = SearchMetadata(
             search_strategy="GridSearchCV",
             param_space={},

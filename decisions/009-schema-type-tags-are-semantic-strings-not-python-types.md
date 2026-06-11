@@ -39,4 +39,4 @@ This convention is enforced by consistent use throughout `schema.py` and by ever
 
 **Cost — convention overhead.** A reader unfamiliar with the codebase will see `"string"` and reasonably wonder why the dict uses a string label instead of `str`. The convention has to be either obvious from context or documented. This ADR is the documentation; consistent use across `schema.py` is the context.
 
-**Cost — silent slips remain possible.** Typing `"strng"` or `"Integer"` would still produce silent failures of the same kind. A future hardening step (validation that every value in `COLUMN_TYPES` is one of the four allowed tags) would close this gap, but is not required by this ADR.
+**Cost — silent slips remain possible.** Typing `"string"` or `"Integer"` would still produce silent failures of the same kind. A future hardening step (validation that every value in `COLUMN_TYPES` is one of the four allowed tags) would close this gap, but is not required by this ADR.

@@ -60,7 +60,7 @@ def test_output_contract_shape():
 
 
 def test_no_drift_yields_low_psi():
-    """PSI should be near zero prodcution matches the baseline distribution"""
+    """PSI should be near zero production matches the baseline distribution"""
     
     baseline = {
         "numerical": {
@@ -85,7 +85,7 @@ def test_no_drift_yields_low_psi():
 
 
 def test_real_drift_tields_high_psi():
-    """PSI should be large when prodcution is concentrated in one region"""
+    """PSI should be large when production is concentrated in one region"""
     baseline = {
         "numerical": {
             "loan_amount": {

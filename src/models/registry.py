@@ -27,7 +27,7 @@ def _selection_result_to_json_dict(result: SelectionResult) -> dict[str, Any]:
 
 
     Only the metadata and metrics are included. The fitted pipeline
-    is saved seperately via joblib, and 'comparison' is excluded
+    is saved separately via joblib, and 'comparison' is excluded
     (it belongs in MLFlow, not in the deployable artifact)
 
     """

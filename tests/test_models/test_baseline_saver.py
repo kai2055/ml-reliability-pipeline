@@ -43,7 +43,7 @@ def test_compute_baseline_percentile_count_and_monotonicity(tiny_xy):
         pcts = baseline["numerical"][col]["percentiles"]
         assert len(pcts) == 99
 
-        # Strictly incresing (or non-decreasing; quantiles can tie with few values)
+        # Strictly increasing (or non-decreasing; quantiles can tie with few values)
         assert all(pcts[i] <= pcts[i + 1] for i in range(len(pcts) - 1))
 
 

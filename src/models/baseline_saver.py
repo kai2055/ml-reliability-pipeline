@@ -14,7 +14,7 @@ def compute_baseline(X_train: pd.DataFrame) -> dict:
     For each numerical feature, stores 99 percentiles, mean, standard
     deviation (population, doof=0), min, max, and the fraction of
     missing values. For each categorical feature, stores the frequency
-    of every observed category (inclludng missing as a seperate 
+    of every observed category (inclludng missing as a separate 
     category).
 
     Args:
@@ -72,9 +72,9 @@ def save_baseline(
     Persist the baseline dictionary as baseline.json in directory.
 
     Creates the directory if it does not exist. If the JSON file
-    already exists and the overwrite is Fasle (the default), a 
-    FileExistError is rasied to prevent accidental replacement
-    of the monitring reference. Pass overwrite=True to replace
+    already exists and the overwrite is False (the default), a 
+    FileExistError is raised to prevent accidental replacement
+    of the monitoring reference. Pass overwrite=True to replace
     intentionally.
 
     The overwrite guard protects the file, not the directory, because
