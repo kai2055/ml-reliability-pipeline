@@ -135,4 +135,3 @@ pytest
 - **Tested wiring** — 110 tests including slow integration tests for both orchestration scripts
 ```
 
-That's the whole file, ready to paste. The Mermaid diagram renders directly on GitHub, shell commands are all fenced, and the structure is clean. Want to move on to flag 2 (hardening CI) now?
