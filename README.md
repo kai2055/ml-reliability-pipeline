@@ -1,6 +1,6 @@
 
 
-```markdown
+
 # ML Reliability Pipeline
 
 An end-to-end ML pipeline for SBA loan default prediction with automated drift monitoring.
@@ -155,5 +155,5 @@ pytest
 - **Metadata-rich outputs** — every tuning run, selection, and drift report carries full audit information
 - **Reproducibility first** — fixed seeds, explicit `ddof` conventions, UTC timestamps
 - **Tested wiring** — 110 tests including slow integration tests for both orchestration scripts
-```
+
 
