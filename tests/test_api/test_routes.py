@@ -62,29 +62,33 @@ def test_model_info(client):
 def test_predict(client):
     """POST /predict returns a valid prediction response."""
     payload = {
-        "features": {
-            "grossapproval": 50000,
-            "sbaguaranteedapproval": 37500.0,
-            "initialinterestrate": 6.5,
-            "terminmonths": 84,
-            "jobssupported": 5,
-            "subprogram": "guaranty",
-            "processingmethod": "sba express program",
-            "fixedorvariableinterestind": "v",
-            "revolverstatus": 0,
-            "businesstype": "corporation",
-            "businessage": "existing, 5 or more years",
-            "collateralind": "true",
-        }
+        "loans": [
+            {
+                "grossapproval": 50000,
+                "sbaguaranteedapproval": 37500.0,
+                "initialinterestrate": 6.5,
+                "terminmonths": 84,
+                "jobssupported": 5,
+                "subprogram": "guaranty",
+                "processingmethod": "sba express program",
+                "fixedorvariableinterestind": "v",
+                "revolverstatus": "0",
+                "businesstype": "corporation",
+                "businessage": "existing, 5 or more years",
+                "collateralind": "true",
+            }
+        ]
     }
     response = client.post("/predict", json=payload)
-    print(response.json())
     assert response.status_code == 200
     data = response.json()
-    assert "default_probability" in data
-    assert "decision" in data
-    assert data["decision"] in ("approve", "reject")
-    assert 0.0 <= data["default_probability"] <= 1.0
+    assert isinstance(data, list)
+    assert len(data) == 1
+    result = data[0]
+    assert "default_probability" in result
+    assert "decision" in result
+    assert result["decision"] in ("approve", "reject")
+    assert 0.0 <= result["default_probability"] <= 1.0
 
 
 
