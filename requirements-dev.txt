@@ -1,0 +1,4 @@
+ruff
+mypy
+codespell
+pytest-cov

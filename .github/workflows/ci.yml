@@ -1,27 +1,42 @@
-
 name: CI
 
 on:
-    push:
-        branches: [main]
-    pull_request:
-        branches: [main]
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
 
-            - name: Set up Python
-              uses: actions/setup-python@v5
-              with:
-                python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          pip install --timeout=300 -r requirements.txt -r requirements-dev.txt
 
-            - name: Install dependencies
-              run: pip install --timeout=300 -r requirements.txt
+      - name: Lint (ruff)
+        run: ruff check src tests scripts
 
-            - name: Run tests
-              run: pytest --ignore=tests/test_scripts -v
+      - name: Type check (mypy)
+        run: mypy src --ignore-missing-imports
+
+      - name: Tests with coverage
+        run: pytest --ignore=tests/test_scripts --cov=src --cov-report=term --cov-fail-under=75
+
+      - name: Spell check
+        run: codespell src tests scripts docs decisions README.md
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify image builds
+        run: docker build -t ml-reliability-pipeline:ci .
