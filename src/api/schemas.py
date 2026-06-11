@@ -1,13 +1,33 @@
 """Pydantic schema for API request and response validation"""
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 
+# ── Predict request / response ────────────────────────────────────
+
+class LoanFeatures(BaseModel):
+    """The 12 features the model was trained on (v1 feature set)."""
+    grossapproval: float = Field(gt=0)
+    sbaguaranteedapproval: float = Field(ge=0)
+    initialinterestrate: float = Field(ge=0, le=50)
+    terminmonths: int = Field(gt=0, le=600)
+    jobssupported: int = Field(ge=0)
+    subprogram: str
+    processingmethod: str
+    fixedorvariableinterestind: str
+    revolverstatus: str
+    businesstype: str
+    businessage: str
+    collateralind: str
+
+    model_config = {"extra": "forbid"}
+
 
 class PredictRequest(BaseModel):
-    features: dict[str, float | str | int | None]
-
+    """Accept a list of loans (batch). A single loan should be sent as a list
+    with one element. The endpoint returns one prediction per loan."""
+    loans: list[LoanFeatures] = Field(min_length=1, max_length=1000)
 
 
 class PredictResponse(BaseModel):
@@ -15,6 +35,8 @@ class PredictResponse(BaseModel):
     decision: str  # "approve" or "reject"
     threshold: float
 
+
+# ── Monitor response ──────────────────────────────────────────────
 
 class FeatureDriftSummary(BaseModel):
     significant: int
@@ -35,4 +57,3 @@ class FeatureDriftDetail(BaseModel):
 class MonitorResponse(BaseModel):
     summary: FeatureDriftSummary
     details: list[FeatureDriftDetail]
-    
