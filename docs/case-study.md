@@ -1,5 +1,7 @@
 # Spreekredit ML Reliability Pipeline — Case Study
 
+> *Spreekredit is a fictional Berlin fintech used as a running scenario for this project. The data is real (SBA 7(a) FOIA extracts); the company is not.*
+
 ## The Problem: Silent Model Degradation
 
 Spreekredit is a Berlin‑based fintech offering small business loans. Their credit risk model scores loan applicants and predicts default probability. The model was trained on a decade of historical SBA 7(a) loan data — stable, pre‑COVID lending from 2010 to 2019.

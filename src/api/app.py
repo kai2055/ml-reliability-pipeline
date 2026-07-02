@@ -57,7 +57,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Spreekredit ML Reliability API",
-    description="Drift detection and credit risk scoring for Spreekredit.",
+    description="Drift detection and credit risk scoring for Spreekredit, a fictional Berlin fintech - running  scenario over real SBA 7(a) data.",
     version="1.0.0",
     lifespan=lifespan,
 )
