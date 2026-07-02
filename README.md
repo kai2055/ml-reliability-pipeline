@@ -110,6 +110,18 @@ pytest -m slow
 pytest
 ```
 
+## Continuous integration
+
+Every push and pull request to `main` runs the checks in [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+
+- **Lint** — `ruff` across `src`, `tests`, and `scripts`
+- **Type check** — `mypy` on `src`
+- **Tests + coverage** — the fast suite runs with a coverage gate; the build fails if coverage of `src` drops below 75%
+- **Spell check** — `codespell` across the code, docs, and ADRs
+- **Docker build** — a separate job verifies the image actually builds
+
+The slow integration tests are skipped in CI and run locally. Deployment is a manual `gcloud run deploy` (above), so this pipeline covers continuous integration, not automated deployment.
+
 ## Project structure
 
 ```
