@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
 
 from src.models.registry import load_model
 from src.monitoring.baseline_loader import load_baseline
@@ -80,3 +81,7 @@ async def log_requests(request: Request, call_next):
 
 
 app.include_router(router)
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse(url="/docs")
