@@ -1,93 +1,101 @@
 # ML Reliability Pipeline
 
-An end-to-end loan-default pipeline built around one question: how do you notice when a model's world has changed underneath it?
+**How do you notice when a model's world has changed underneath it?**
+
+A model that passed every test on launch day slowly goes wrong as the world moves on — and the first sign is usually an angry user. This end-to-end loan-default pipeline exists to catch that gap early: it trains on 2010–2019 U.S. SBA loan data, then watches 2020-onward production data for drift against that training baseline. **The model isn't the point — the monitoring is.**
 
 [![CI](https://github.com/kai2055/ml-reliability-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/kai2055/ml-reliability-pipeline/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
+![PSI drift](https://img.shields.io/badge/drift-PSI-orange)
+![MLflow](https://img.shields.io/badge/MLflow-0194E2?logo=mlflow&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![Cloud Run](https://img.shields.io/badge/GCP%20Cloud%20Run-4285F4?logo=googlecloud&logoColor=white)
+![tests](https://img.shields.io/badge/tests-112-brightgreen)
+![coverage gate](https://img.shields.io/badge/coverage%20gate-75%25-green)
+![ADRs](https://img.shields.io/badge/ADRs-27-blue)
 
-The pipeline trains on SBA 7(a) loan data from 2010–2019, then watches 2020-onward production data for drift against that training baseline. The interesting part isn't the model — it's what the monitor caught. After COVID, 7 of 12 features drifted significantly, and the average initial interest rate moved 1.46 standard deviations from its pre-pandemic baseline. A model trained in 2019 was making decisions in a world that no longer matched its training data. Noticing that gap is the whole point of the project.
+🔗 **[Live API](https://ml-reliability-pipeline-1061232555311.europe-west1.run.app/docs)** — call all four endpoints from the browser, no code required &nbsp;·&nbsp; 🎥 Demo *(coming)* <!-- replace with: 🎥 [Watch demo](VIDEO_URL) -->
 
-## How it's built
+<!-- Screenshot slot — drop a drift-report or /docs screenshot here:
+![drift report](docs/img/drift-report.png)
+-->
 
-Four layers, each with one job:
-
-- **Data** — loads the extracts, validates them against a frozen schema, and transforms them for training. If the FOIA format changes, the pipeline fails fast with a clear error instead of quietly training on the wrong thing.
-- **Models** — trains candidates, tunes them, evaluates, and selects one, with every run tracked in MLflow. The chosen model and its metadata are saved as a versioned artifact.
-- **Monitoring** — snapshots a baseline at training time, then scores production data against it with PSI and applies a drift policy to decide what counts as significant.
-- **Serving** — a FastAPI app exposes the prediction and drift endpoints, deployed on GCP Cloud Run.
-
-The flow runs in that order: **train → snapshot baseline → monitor production → serve.**
+---
 
 ## What the monitor caught
 
-The full write-up is in [`docs/case-study.md`](docs/case-study.md) — model performance on FY2010–2019 and the COVID-19 drift story detected on FY2020+ data. The headline findings:
+After COVID, a model trained on a pre-pandemic world kept scoring 2020 applicants as if nothing had changed. The monitoring layer surfaced exactly that:
 
-- **7 of 12 features** drifted significantly (PSI > 0.25) in production data
-- The strongest signal was `initialinterestrate`, which shifted **1.46 standard deviations** post-COVID
-- The baseline model is a Random Forest (ROC-AUC 0.9721 on the held-out test set), selected by the policy in [ADR-021](decisions/021-model-selection-and-threshold-policy.md)
+| Signal | Finding |
+| --- | --- |
+| 🚩 Features drifted significantly (PSI > 0.25) | **7 of 12** |
+| 📈 Strongest drift | **initial interest rate — 1.46 standard deviations** post-COVID |
+| 🧪 Baseline model | Random Forest, ROC-AUC **0.9721** on held-out test |
 
-That 0.97 is a red flag, not a trophy. An AUC that high on loan-default prediction almost always means label leakage — some feature quietly encoding the outcome it's supposed to predict. I haven't run the leakage audit yet; it's scoped for v2. Until then the model is best read as scaffolding: something for the monitoring layer to watch. The monitoring is the point here, not the model.
+**On that 0.97 — it's a red flag, not a trophy.** An AUC that high on loan-default prediction almost always means label leakage: some feature quietly encoding the outcome it's meant to predict. The leakage audit is scoped for v2; until then the model is scaffolding — something for the monitoring layer to watch. Naming that openly is deliberate. Reliability work means knowing where your system is weak.
+
+Full write-up: [`docs/case-study.md`](docs/case-study.md).
+
+---
+
+## How it's built
+
+Four layers, each with exactly one job. The flow runs in order: **train → snapshot baseline → monitor production → serve.**
+
+| Layer | Job |
+| --- | --- |
+| **Data** | Loads the FOIA extracts, validates them against a frozen schema, transforms them for training. If the extract format changes, the pipeline **fails fast** with a clear error instead of quietly training on the wrong thing. |
+| **Models** | Trains candidates, tunes, evaluates, and selects one — every run tracked in MLflow, the chosen model saved as a versioned artifact. |
+| **Monitoring** | Snapshots a baseline at training time, scores production data against it with **PSI**, and applies a documented drift policy to decide what counts as significant. |
+| **Serving** | A FastAPI app exposes the prediction and drift endpoints, deployed on GCP Cloud Run. |
+
+**Design principles:** separation of concerns (no cross-layer imports the contracts don't demand) · frozen dataclasses for config and results · metadata-rich outputs (every tuning run, selection, and drift report carries full audit info) · reproducibility first (fixed seeds, explicit `ddof`, UTC timestamps).
+
+---
 
 ## Decisions are written down
 
-Every non-trivial decision in this project has an Architecture Decision Record. There are 27 of them in [`decisions/`](decisions/), numbered in the order they were made. A few that show the kind of thing they capture:
+Every non-trivial decision is an **Architecture Decision Record** — 27 of them in [`decisions/`](decisions/), numbered in the order they were made. The code tells you *what*; the ADRs tell you *why*. A few:
 
-- **[ADR-012](decisions/012-schema-is-the-source-of-truth.md)** — the schema is the single source of truth, and everything validates against it
-- **[ADR-021](decisions/021-model-selection-and-threshold-policy.md)** — how the model and its classification threshold get selected
-- **[ADR-027](decisions/027-drift-response-strategy-rebaselining-retraining-and-why-v1-stops-at-detection.md)** — why v1 stops at *detecting* drift instead of automatically retraining
+- **ADR-012** — the schema is the single source of truth; everything validates against it
+- **ADR-021** — how the model and its classification threshold get selected
+- **ADR-027** — why v1 stops at *detecting* drift instead of auto-retraining
 
-I kept them because six months later the code tells you what, not why. The ADRs are the why.
+---
 
-## Quick Start
+## Quick start
 
-**Install dependencies**
 ```bash
+# 1. Install
 pip install -r requirements.txt
-```
 
-**Run the training pipeline** — trains and selects the best model on FY2010–2019 data.
-```bash
+# 2. Train + select the best model on FY2010–2019 data
 python scripts/run_training.py
-```
 
-**Run the monitoring pipeline** — detects drift in FY2020+ production data against the training baseline.
-```bash
+# 3. Detect drift in FY2020+ production data against the training baseline
 python scripts/run_monitoring.py
+
+# 4. Serve
+uvicorn src.api.app:app --reload   # interactive docs at http://127.0.0.1:8000/docs
 ```
 
-**Start the API**
-```bash
-uvicorn src.api.app:app --reload
-```
-Interactive docs at http://127.0.0.1:8000/docs.
+### Getting the data
 
-## Live API
-
-The API is deployed on GCP Cloud Run and publicly reachable:
-
-- **Base URL:** https://ml-reliability-pipeline-1061232555311.europe-west1.run.app
-- **Interactive docs:** https://ml-reliability-pipeline-1061232555311.europe-west1.run.app/docs
-
-The `/docs` page lets you call all four endpoints from the browser without writing any code.
-
-## Getting the data
-
-The pipeline expects two CSV files in `data/raw/` (the raw files are not committed):
+The pipeline expects two CSVs in `data/raw/` (not committed). Column expectations are enforced by `src/data/schema.py` — it fails fast if the extract format has drifted.
 
 | File | Source | Rows |
-|------|--------|------|
+| --- | --- | --- |
 | `sba_7a_2010_2019.csv` | SBA 7(a) FOIA extracts FY2010–FY2019 | ~545k |
 | `sba_7a_2020_present.csv` | SBA 7(a) FOIA extracts FY2020+ | production window |
 
-1. Visit the [SBA 7(a) & 504 FOIA data page](https://data.sba.gov/dataset/7-a-504-foia)
-2. Download the CSV extracts for FY2010 through FY2019
-3. Concatenate them into `data/raw/sba_7a_2010_2019.csv`
-4. Repeat for the production window (FY2020–present) as `data/raw/sba_7a_2020_present.csv`
+Download the CSV extracts from the SBA 7(a) & 504 FOIA data page, concatenate the FY2010–2019 range into the first file, and the FY2020–present window into the second.
 
-Column expectations are enforced by `src/data/schema.py` — the pipeline fails fast if the extract format has drifted.
+---
 
 ## Deploying to Cloud Run
 
-The model artifact is 218MB, so Cloud Run needs at least 2GB of memory:
+The model artifact is 218 MB, so Cloud Run needs at least 2 GB of memory:
 
 ```bash
 gcloud run deploy ml-reliability-pipeline \
@@ -95,32 +103,21 @@ gcloud run deploy ml-reliability-pipeline \
   --platform managed --region europe-west1 --allow-unauthenticated --memory 2Gi
 ```
 
-## Running tests
+---
 
-112 tests, including slow integration tests that exercise both orchestration scripts end to end.
+## Tests & CI
+
+**112 tests**, including slow integration tests that drive both orchestration scripts end to end.
 
 ```bash
-# Everything except the slow integration tests
-pytest --ignore=tests/test_scripts
-
-# Only the slow integration tests
-pytest -m slow
-
-# Full suite
-pytest
+pytest --ignore=tests/test_scripts   # everything except the slow integration tests
+pytest -m slow                       # only the slow integration tests
+pytest                               # full suite
 ```
 
-## Continuous integration
+Every push and PR to `main` runs `.github/workflows/ci.yml`: **ruff** lint · **mypy** type check · fast tests with a **coverage gate** (build fails below 75% on `src`) · **codespell** · a separate **Docker build** job. Slow integration tests run locally. Deployment is a manual `gcloud run deploy` — so this pipeline covers continuous *integration*, not automated deployment.
 
-Every push and pull request to `main` runs the checks in [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
-
-- **Lint** — `ruff` across `src`, `tests`, and `scripts`
-- **Type check** — `mypy` on `src`
-- **Tests + coverage** — the fast suite runs with a coverage gate; the build fails if coverage of `src` drops below 75%
-- **Spell check** — `codespell` across the code, docs, and ADRs
-- **Docker build** — a separate job verifies the image actually builds
-
-The slow integration tests are skipped in CI and run locally. Deployment is a manual `gcloud run deploy` (above), so this pipeline covers continuous integration, not automated deployment.
+---
 
 ## Project structure
 
@@ -137,10 +134,3 @@ The slow integration tests are skipped in CI and run locally. Deployment is a ma
 │   └── api/           # FastAPI serving layer
 └── tests/             # test suite
 ```
-
-## Key design principles
-
-- **Separation of concerns** — each layer has one job; no cross-layer imports where the contracts don't demand it
-- **Frozen dataclasses** — configuration and result objects are immutable
-- **Metadata-rich outputs** — every tuning run, selection, and drift report carries full audit information
-- **Reproducibility first** — fixed seeds, explicit `ddof` conventions, UTC timestamps
