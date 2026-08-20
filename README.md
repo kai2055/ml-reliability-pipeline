@@ -15,11 +15,17 @@ A model that passed every test on launch day slowly goes wrong as the world move
 ![coverage gate](https://img.shields.io/badge/coverage%20gate-75%25-green)
 ![ADRs](https://img.shields.io/badge/ADRs-27-blue)
 
-🔗 **[Live API](https://ml-reliability-pipeline-1061232555311.europe-west1.run.app/docs)** — call all four endpoints from the browser, no code required &nbsp;·&nbsp; 🎥 Demo *(coming)* <!-- replace with: 🎥 [Watch demo](VIDEO_URL) -->
+🔗 **[Live API](https://ml-reliability-pipeline-1061232555311.europe-west1.run.app/docs)** — call all four endpoints from the browser, no code required
 
-<!-- Screenshot slot — drop a drift-report or /docs screenshot here:
-![drift report](docs/img/drift-report.png)
--->
+![ML Reliability Pipeline demo](docs/img/demo.gif)
+
+**Score an applicant — probability vs. the tuned 0.23 threshold:**
+
+![prediction response with default probability and decision](docs/img/prediction-response.png)
+
+**More than a model — a /monitor endpoint watches production data for drift:**
+
+![monitor endpoint and schemas](docs/img/monitor-response.png)
 
 ---
 
